@@ -2,20 +2,19 @@ import os
 import random
 from pygame import mixer
 import pygame
+import constants
 
 pygame.init()
 pygame.display.set_caption('Carcassone')
-table_size = table_size_x, table_size_y = 5, 8
 
-screen_size_base = 100
-screen = pygame.display.set_mode((screen_size_base*table_size_x, screen_size_base*table_size_y)) # Card sized screen
+screen = pygame.display.set_mode((constants.SCREEN_SIZE_BASE*constants.TABLE_SIZE_X, constants.SCREEN_SIZE_BASE*constants.TABLE_SIZE_Y)) # Card sized screen
 # screen = pygame.display.set_mode((1600, 900)) # Fix sized screen
 # screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN) # Full screen mode
 
-if screen.get_width()/table_size_x > screen.get_height()/table_size_y:
-    image_size = [screen.get_height()/table_size_y,screen.get_height()/table_size_y]
+if screen.get_width()/constants.TABLE_SIZE_X > screen.get_height()/constants.TABLE_SIZE_Y:
+    image_size = [screen.get_height()/constants.TABLE_SIZE_Y,screen.get_height()/constants.TABLE_SIZE_Y]
 else:
-    image_size = [screen.get_width()/table_size_x, screen.get_width()/table_size_x]
+    image_size = [screen.get_width()/constants.TABLE_SIZE_X, screen.get_width()/constants.TABLE_SIZE_X]
 
 path = "../Images/Tiles"
 Tiles = {
@@ -61,6 +60,9 @@ cards = []
 running = True
 while running:
 
+    if len(cards) == constants.TABLE_SIZE_X * constants.TABLE_SIZE_Y:
+        running = False
+
     for event in pygame.event.get():
 
         for card in cards:
@@ -72,8 +74,16 @@ while running:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             pos = pygame.mouse.get_pos()
             grid = grid_x, grid_y = pos[0]//image_size[0], pos[1]//image_size[0]
-            if grid_x + 1 <= table_size_x and grid_y + 1 <= table_size_y:
-                cards.append(Card(Tiles["ut1"], grid_x, grid_y))
+
+            is_duplicate = False
+
+            for card in cards:
+                if card.pos_x == grid_x and card.pos_y == grid_y:
+                    is_duplicate = True
+
+
+            if grid_x + 1 <= constants.TABLE_SIZE_X and grid_y + 1 <= constants.TABLE_SIZE_Y and not is_duplicate:
+                cards.append(Card(random.choice(list(Tiles.values())), grid_x, grid_y))
 
 
 
