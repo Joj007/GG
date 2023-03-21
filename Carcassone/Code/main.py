@@ -4,10 +4,16 @@ from pygame import mixer
 import pygame
 
 pygame.init()
-pygame.display.set_caption('A játék elkezdődött')
-size = 40
-image_size = [50,50]
-screen = pygame.display.set_mode((16*size, 9*size))
+pygame.display.set_caption('Carcassone')
+table_size = table_size_x, table_size_y = 5, 6
+
+
+screen = pygame.display.set_mode((500, 500))
+
+if screen.get_width()/table_size_x > screen.get_height()/table_size_y:
+    image_size = [screen.get_height()/table_size_y,screen.get_height()/table_size_y]
+else:
+    image_size = [screen.get_width()/table_size_x, screen.get_width()/table_size_x]
 
 path = "../Images/Tiles"
 Tiles = {
@@ -37,16 +43,34 @@ Tiles = {
     "ut7": pygame.transform.scale(pygame.image.load(f"{path}/ut7.png").convert_alpha(), image_size),
 }
 
+class Card:
+    def __init__(self, image, x, y):
+        self.image = image
+        self.pos = self.pos_x, self.pos_y = x, y
+
+    def draw(self):
+        screen.blit(self.image, (self.pos_x*image_size[0], self.pos_y*image_size[0]))
+
+
+
+cards = []
+
 
 running = True
 while running:
 
-    screen.blit(Tiles["ut2"], (0,0,0,0))
-
     for event in pygame.event.get():
+
+        for card in cards:
+            card.draw()
+
         if event.type == pygame.QUIT:
             running = False
             exit()
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            pos = pygame.mouse.get_pos()
+            cards.append(Card(Tiles["ut1"], pos[0]//image_size[0], pos[1]//image_size[0]))
+
 
 
     pygame.display.update()
