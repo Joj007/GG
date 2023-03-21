@@ -5,10 +5,12 @@ import pygame
 
 pygame.init()
 pygame.display.set_caption('Carcassone')
-table_size = table_size_x, table_size_y = 5, 6
+table_size = table_size_x, table_size_y = 5, 8
 
-
-screen = pygame.display.set_mode((500, 500))
+screen_size_base = 100
+screen = pygame.display.set_mode((screen_size_base*table_size_x, screen_size_base*table_size_y)) # Card sized screen
+# screen = pygame.display.set_mode((1600, 900)) # Fix sized screen
+# screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN) # Full screen mode
 
 if screen.get_width()/table_size_x > screen.get_height()/table_size_y:
     image_size = [screen.get_height()/table_size_y,screen.get_height()/table_size_y]
@@ -69,7 +71,9 @@ while running:
             exit()
         elif event.type == pygame.MOUSEBUTTONDOWN:
             pos = pygame.mouse.get_pos()
-            cards.append(Card(Tiles["ut1"], pos[0]//image_size[0], pos[1]//image_size[0]))
+            grid = grid_x, grid_y = pos[0]//image_size[0], pos[1]//image_size[0]
+            if grid_x + 1 <= table_size_x and grid_y + 1 <= table_size_y:
+                cards.append(Card(Tiles["ut1"], grid_x, grid_y))
 
 
 
