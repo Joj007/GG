@@ -1,9 +1,5 @@
-import math
-import os
-import random
+import math, os, random, pygame, constants
 from pygame import mixer
-import pygame
-import constants
 
 pygame.init()
 pygame.display.set_caption('Carcassone')
