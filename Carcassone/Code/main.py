@@ -21,32 +21,7 @@ path = "../Images/Tiles"
 def ImageLoader(file_name):
     return pygame.transform.scale(pygame.image.load(f"{path}/{file_name}.png").convert_alpha(), image_size)
 
-Tiles = {
-    "varos1": ImageLoader("varos1"),
-    "varos2": ImageLoader("varos2"),
-    "varos3": ImageLoader("varos3"),
-    "varos4": ImageLoader("varos4"),
-    "varos5": ImageLoader("varos5"),
-    "varos6": ImageLoader("varos6"),
-    "varos7": ImageLoader("varos7"),
-    "varos8": ImageLoader("varos8"),
-    "varos9": ImageLoader("varos9"),
-    "varos10": ImageLoader("varos10"),
-    "varos11": ImageLoader("varos11"),
-    "varos12": ImageLoader("varos12"),
-    "keresztezodes3": ImageLoader("keresztezodes3"),
-    "keresztezodes4": ImageLoader("keresztezodes4"),
-    "keresztezodes32": ImageLoader("keresztezodes32"),
-    "kolostor1": ImageLoader("kolostor1"),
-    "kolostor2": ImageLoader("kolostor2"),
-    "ut1": ImageLoader("ut1"),
-    "ut2": ImageLoader("ut2"),
-    "ut3": ImageLoader("ut3"),
-    "ut4": ImageLoader("ut4"),
-    "ut5": ImageLoader("ut5"),
-    "ut6": ImageLoader("ut6"),
-    "ut7": ImageLoader("ut7"),
-}
+Tiles = ["varos1", "varos2", "varos3", "varos4", "varos5", "varos6", "varos7", "varos8", "varos9", "varos10", "varos11", "varos12", "keresztezodes3", "keresztezodes4", "keresztezodes32", "kolostor1", "kolostor2", "ut1", "ut2", "ut3", "ut4", "ut5", "ut6", "ut7"]
 Backgrounds = {
     "bg_wide": pygame.transform.scale(pygame.image.load(f"{path}/../Backgrounds/carcassonneBG1.jfif").convert_alpha(), (screen.get_width(), screen.get_height())),
     "bg_tall": pygame.transform.scale(pygame.image.load(f"{path}/../Backgrounds/carcassonneBG2.webp").convert_alpha(), (screen.get_width(), screen.get_height())),
@@ -124,7 +99,7 @@ class CircleButton:
 
 cards = []
 buttons = [CircleButton(60,50, 40, (10,50,200), False), RectButton(150,50, 300, 200, (200,200,40), [], True)]
-choosen_card = random.choice(list(Tiles.values()))
+choosen_card = ImageLoader(random.choice(Tiles))
 
 transparent_square = pygame.Surface(image_size)
 transparent_square.set_alpha(128)
@@ -164,7 +139,7 @@ while running:
 
                 if grid_x + 1 <= constants.TABLE_SIZE_X and grid_y + 1 <= constants.TABLE_SIZE_Y and not is_duplicate:
                     cards.append(Card(choosen_card, grid_x, grid_y))
-                    choosen_card = random.choice(list(Tiles.values()))
+                    choosen_card = ImageLoader(random.choice(Tiles))
 
             elif event.type == pygame.MOUSEWHEEL:
                 if event.y == 1:
