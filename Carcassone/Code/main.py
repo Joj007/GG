@@ -95,10 +95,37 @@ class CircleButton:
             if distance < self.radius:
                 print('O')
 
+class CenterRectButton:
+    def __init__(self, width, height, pos_y, color=(100,100,100), functions=[], is_start=False, text="Start", text_size=36):
+        self.width = width
+        self.act_width = screen.get_width()*self.width/100
+        self.height = height
+        self.act_height = screen.get_height()*self.height/100
+        self.pos_y = pos_y
+        self.color = color
+        self.functions = functions
+        self.is_start_button = is_start
+        self.to_game = False
+        self.font = pygame.font.Font('freesansbold.ttf', text_size)
+        self.text = self.font.render(text, True, (255, 255, 255))
+        self.textRect = self.text.get_rect(center=(self.act_width,self.pos_y+self.act_height/2))
+
+    def draw(self):
+        pygame.draw.rect(screen, self.color, (self.act_width/2, self.pos_y, self.act_width, self.act_height), 0, 50)
+        screen.blit(self.text, self.textRect)
+
+    def click(self, event):
+        mouse_pos = mouse_pos_x, mouse_pos_y = pygame.mouse.get_pos()
+        if event.type == pygame.MOUSEBUTTONDOWN and self.act_width/2 < mouse_pos_x < self.act_width/2+self.act_width and self.pos_y < mouse_pos_y < self.pos_y + self.act_height:
+            if not self.is_start_button:
+                for index in range(len(self.functions)):
+                    self.functions[index]()
+            else:
+                self.to_game = True
 
 
 cards = []
-buttons = [CircleButton(60,50, 40, (10,50,200), False), RectButton(150,50, 300, 200, (200,200,40), [], True)]
+buttons = [CenterRectButton(50, 10, 50, (100,0,200), [], True, "START"), CenterRectButton(50, 10, 150, (0,100,0), [], False, "SETTINGS"), CenterRectButton(50, 10, 250, (200,0,100), [], False, "EXIT")]
 choosen_card = ImageLoader(random.choice(Tiles))
 
 transparent_square = pygame.Surface(image_size)
