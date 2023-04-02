@@ -20,8 +20,39 @@ else:
 
 path = "../Images/Tiles"
 
+
 def ImageLoader(file_name):
     return pygame.transform.scale(pygame.image.load(f"{path}/{file_name}.png").convert_alpha(), image_size)
+
+
+def Placeable(selected_card, location, placed_cards):  # selected_card egy card class, a location egy számpár [2, 3], a placed_cards pedig egy lista a lerakott kártya classekkel
+    location = [int(location[1]-1), int(location[0]-1)]
+    matrix = []
+    temp_row = []
+    for x in range(8):
+        for y in range(5):
+            temp_row.append(" ")
+        matrix.append(temp_row)
+        temp_row = []
+
+    if len(placed_cards) > 0:
+        for card in placed_cards:
+            matrix[int(card.pos_y)][int(card.pos_x)] = card
+
+        # az if megvizsgálja mind a 4 oldalát a selected_cardnak
+        if (location[0] - 1 < 0 or matrix[location[0] - 1][location[1]] == " " or selected_card.sides[0] == matrix[location[0] - 1][location[1]].sides[2]) and \
+                (location[1] + 1 > 4 or matrix[location[0]][location[1] + 1] == " " or selected_card.sides[1] == matrix[location[0]][location[1] + 1].sides[3]) and \
+                (location[0] + 1 > 7 or matrix[location[0] + 1][location[1]] == " " or selected_card.sides[2] == matrix[location[0] + 1][location[1]].sides[0]) and \
+                (location[1] - 1 < 0 or matrix[location[0]][location[1] - 1] == " " or selected_card.sides[3] == matrix[location[0]][location[1] - 1].sides[1]):
+            return True
+        else:
+            return False
+    else:
+        return True
+
+
+
+
 
 Tiles = ["varos1", "varos2", "varos3", "varos4", "varos5", "varos6", "varos7", "varos8", "varos9", "varos10", "varos11", "varos12", "keresztezodes3", "keresztezodes4", "keresztezodes32", "kolostor1", "kolostor2", "ut1", "ut2", "ut3", "ut4", "ut5", "ut6", "ut7"]
 Backgrounds = {
@@ -48,7 +79,7 @@ class Card:
     def __init__(self, image, x, y):
         self.image = image
         self.pos = self.pos_x, self.pos_y = x, y
-        self.sides = 'mvmmm'
+        self.sides = 'vmvmm'
 
     def draw(self):
         screen.blit(self.image, (self.pos_x*image_size[0], self.pos_y*image_size[1]))
@@ -172,8 +203,7 @@ while running:
                     if card.pos_x == grid_x and card.pos_y == grid_y:
                         is_duplicate = True
 
-
-                if grid_x + 1 <= constants.TABLE_SIZE_X and grid_y + 1 <= constants.TABLE_SIZE_Y and not is_duplicate:
+                if grid_x + 1 <= constants.TABLE_SIZE_X and grid_y + 1 <= constants.TABLE_SIZE_Y and not is_duplicate and Placeable(Card(choosen_card, grid_x, grid_y), [grid_x + 1, grid_y + 1], cards):
                     cards.append(Card(choosen_card, grid_x, grid_y))
                     choosen_card = ImageLoader(random.choice(Tiles))
 
