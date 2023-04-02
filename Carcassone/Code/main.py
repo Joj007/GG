@@ -5,6 +5,8 @@ pygame.init()
 pygame.display.set_caption('Carcassone')
 
 
+
+
 running = True
 mode = "menu"
 screen = pygame.display.set_mode((constants.SCREEN_SIZE_BASE*constants.TABLE_SIZE_X, constants.SCREEN_SIZE_BASE*constants.TABLE_SIZE_Y)) # Card sized screen
@@ -27,7 +29,13 @@ Backgrounds = {
     "bg_tall": pygame.transform.scale(pygame.image.load(f"{path}/../Backgrounds/carcassonneBG2.webp").convert_alpha(), (screen.get_width(), screen.get_height())),
     "bg_square": pygame.transform.scale(pygame.image.load(f"{path}/../Backgrounds/carcassonneBG3.jpg").convert_alpha(), (screen.get_width(), screen.get_height())),
     "bg_game": pygame.transform.scale(pygame.image.load(f"{path}/../Backgrounds/gameBG.jpg").convert_alpha(), (screen.get_height() if screen.get_height() > screen.get_width() else screen.get_width(), screen.get_height() if screen.get_height() > screen.get_width() else screen.get_width())),
+    "icon": pygame.image.load('../Images/Backgrounds/Logo.webp'),
+    "title": pygame.transform.scale(pygame.image.load('../Images/Backgrounds/Title.png'), (screen.get_width()/1.2, screen.get_width()/1.2/4)),
 }
+
+title_rect = Backgrounds['title'].get_rect(midtop=(screen.get_width()/2, 20))
+
+pygame.display.set_icon(Backgrounds['icon'])
 
 menu_background = Backgrounds["bg_tall"]
 
@@ -40,6 +48,7 @@ class Card:
     def __init__(self, image, x, y):
         self.image = image
         self.pos = self.pos_x, self.pos_y = x, y
+        self.sides = 'mvmmm'
 
     def draw(self):
         screen.blit(self.image, (self.pos_x*image_size[0], self.pos_y*image_size[1]))
@@ -107,7 +116,7 @@ class CenterRectButton:
         self.is_start_button = is_start
         self.to_game = False
         self.font = pygame.font.Font('freesansbold.ttf', text_size)
-        self.text = self.font.render(text, True, (255, 255, 255))
+        self.text = self.font.render(text.upper(), True, (255, 255, 255))
         self.textRect = self.text.get_rect(center=(self.act_width,self.pos_y+self.act_height/2))
 
     def draw(self):
@@ -125,7 +134,7 @@ class CenterRectButton:
 
 
 cards = []
-buttons = [CenterRectButton(50, 10, 50, (100,0,200), [], True, "START"), CenterRectButton(50, 10, 150, (0,100,0), [], False, "SETTINGS"), CenterRectButton(50, 10, 250, (200,0,100), [], False, "EXIT")]
+buttons = [CenterRectButton(50, 10, 350, (100,0,200), [], True, "START"), CenterRectButton(50, 10, 450, (0,100,0), [], False, "SETTINGS"), CenterRectButton(50, 10, 550, (200,0,100), [], False, "EXIT")]
 choosen_card = ImageLoader(random.choice(Tiles))
 
 transparent_square = pygame.Surface(image_size)
@@ -185,7 +194,8 @@ while running:
 
 
     elif mode == "menu":
-        screen.blit(menu_background, (0,0))
+        pygame.draw.rect(screen, (0,50,150) ,(0,0,screen.get_width(),screen.get_height()))
+        screen.blit(Backgrounds["title"], title_rect)
 
         for button in buttons:
             button.draw()
