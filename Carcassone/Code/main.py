@@ -64,7 +64,7 @@ def Placeable(selected_card, location, placed_cards):  # selected_card egy card 
 
 
 
-Tiles = ["varos1", "varos2", "varos3", "varos4", "varos5", "varos6", "varos7", "varos8", "varos9", "varos10", "varos11", "varos12", "keresztezodes3", "keresztezodes4", "keresztezodes32", "kolostor1", "kolostor2", "ut1", "ut2", "ut3", "ut4", "ut5", "ut6", "ut7"]
+Tiles = ["mmmmk", "mmumk", "mmuu_", "mumu_", "muuu_", "mvmvc", "mvmvv", "uuuu_", "vmmm_", "vmuu_", "vmvm_", "vumu_", "vuum_", "vuuu_", "vvmm_", "vvmmc", "vvmmv", "vvmvc", "vvmvv", "vvuu_", "vvuuc", "vvuvc", "vvuvv", "vvvvc"]
 Backgrounds = {
     "bg_wide": pygame.transform.scale(pygame.image.load(f"{path}/../Backgrounds/carcassonneBG1.jfif").convert_alpha(), (screen.get_width(), screen.get_height())),
     "bg_tall": pygame.transform.scale(pygame.image.load(f"{path}/../Backgrounds/carcassonneBG2.webp").convert_alpha(), (screen.get_width(), screen.get_height())),
@@ -86,10 +86,11 @@ elif screen.get_width() > screen.get_height():
     menu_background = Backgrounds["bg_wide"]
 
 class Card:
-    def __init__(self, image, x, y):
+    def __init__(self, image, x, y, name):
         self.image = image
         self.pos = self.pos_x, self.pos_y = x, y
-        self.sides = 'vmvmm'
+        self.sides = name
+        print(image)
 
     def draw(self):
         screen.blit(self.image, (self.pos_x*image_size[0], self.pos_y*image_size[1]))
@@ -176,7 +177,8 @@ class CenterRectButton:
 
 cards = []
 buttons = [CenterRectButton(50, 10, 350, (100,0,200), [], True, "START"), CenterRectButton(50, 10, 450, (0,100,0), [], False, "SETTINGS"), CenterRectButton(50, 10, 550, (200,0,100), [], False, "EXIT")]
-choosen_card = ImageLoader(random.choice(Tiles))
+choosen_tile = random.choice(Tiles)
+choosen_card = ImageLoader(choosen_tile)
 
 transparent_square = pygame.Surface(image_size)
 transparent_square.set_alpha(128)
@@ -213,15 +215,18 @@ while running:
                     if card.pos_x == grid_x and card.pos_y == grid_y:
                         is_duplicate = True
 
-                if grid_x + 1 <= constants.TABLE_SIZE_X and grid_y + 1 <= constants.TABLE_SIZE_Y and not is_duplicate and Placeable(Card(choosen_card, grid_x, grid_y), [grid_x + 1, grid_y + 1], cards):
-                    cards.append(Card(choosen_card, grid_x, grid_y))
-                    choosen_card = ImageLoader(random.choice(Tiles))
+                if grid_x + 1 <= constants.TABLE_SIZE_X and grid_y + 1 <= constants.TABLE_SIZE_Y and not is_duplicate and Placeable(Card(choosen_card, grid_x, grid_y, choosen_tile), [grid_x + 1, grid_y + 1], cards):
+                    cards.append(Card(choosen_card, grid_x, grid_y, choosen_tile))
+                    choosen_tile = random.choice(Tiles)
+                    choosen_card = ImageLoader(choosen_tile)
 
             elif event.type == pygame.MOUSEWHEEL:
                 if event.y == 1:
-                  choosen_card = pygame.transform.rotate(choosen_card, 90)
+                    choosen_card = pygame.transform.rotate(choosen_card, 90)
+                    choosen_tile = f"{choosen_tile[1]}{choosen_tile[2]}{choosen_tile[3]}{choosen_tile[0]}{choosen_tile[4]}"
                 elif event.y == -1:
                     choosen_card = pygame.transform.rotate(choosen_card, -90)
+                    choosen_tile = f"{choosen_tile[3]}{choosen_tile[0]}{choosen_tile[1]}{choosen_tile[2]}{choosen_tile[4]}"
 
         pos = pygame.mouse.get_pos()
         grid = grid_x, grid_y = pos[0] // image_size[0], pos[1] // image_size[0]
