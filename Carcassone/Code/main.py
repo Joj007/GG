@@ -29,6 +29,8 @@ def Placeable(selected_card, location, placed_cards):  # selected_card egy card 
     location = [int(location[1]-1), int(location[0]-1)]
     matrix = []
     temp_row = []
+    is_connected = False
+
     for x in range(8):
         for y in range(5):
             temp_row.append(" ")
@@ -39,12 +41,20 @@ def Placeable(selected_card, location, placed_cards):  # selected_card egy card 
         for card in placed_cards:
             matrix[int(card.pos_y)][int(card.pos_x)] = card
 
-        # az if megvizsgálja mind a 4 oldalát a selected_cardnak
-        if (location[0] - 1 < 0 or matrix[location[0] - 1][location[1]] == " " or selected_card.sides[0] == matrix[location[0] - 1][location[1]].sides[2]) and \
-                (location[1] + 1 > 4 or matrix[location[0]][location[1] + 1] == " " or selected_card.sides[1] == matrix[location[0]][location[1] + 1].sides[3]) and \
-                (location[0] + 1 > 7 or matrix[location[0] + 1][location[1]] == " " or selected_card.sides[2] == matrix[location[0] + 1][location[1]].sides[0]) and \
-                (location[1] - 1 < 0 or matrix[location[0]][location[1] - 1] == " " or selected_card.sides[3] == matrix[location[0]][location[1] - 1].sides[1]):
-            return True
+        #megvizsgálja, hogy csatlakozik-e
+        if (location[0] - 1 >= 0 and matrix[location[0] - 1][location[1]] != " ") or \
+                (location[1] + 1 <= 4 and matrix[location[0]][location[1] + 1] != " ") or \
+                (location[0] + 1 <= 7 and matrix[location[0] + 1][location[1]] != " ") or \
+                (location[1] - 1 >= 0 and matrix[location[0]][location[1] - 1] != " "):
+
+            #megvizsgálja mind a 4 oldalát a selected_cardnak
+            if (location[0] - 1 < 0 or matrix[location[0] - 1][location[1]] == " " or selected_card.sides[0] == matrix[location[0] - 1][location[1]].sides[2]) and \
+                    (location[1] + 1 > 4 or matrix[location[0]][location[1] + 1] == " " or selected_card.sides[1] == matrix[location[0]][location[1] + 1].sides[3]) and \
+                    (location[0] + 1 > 7 or matrix[location[0] + 1][location[1]] == " " or selected_card.sides[2] == matrix[location[0] + 1][location[1]].sides[0]) and \
+                    (location[1] - 1 < 0 or matrix[location[0]][location[1] - 1] == " " or selected_card.sides[3] == matrix[location[0]][location[1] - 1].sides[1]):
+                return True
+            else:
+                return False
         else:
             return False
     else:
