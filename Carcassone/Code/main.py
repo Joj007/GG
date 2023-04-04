@@ -81,12 +81,12 @@ def Is_game_over(selected_card, placed_cards):
 def Create_pack():
     All_tiles = ["mmmmk", "mmumk", "mmuu_", "mumu_", "muuu_", "mvmvc", "mvmvv", "uuuu_", "vmmm_", "vmuu_", "vmvm_",
                  "vumu_", "vuum_", "vuuu_", "vvmm_", "vvmmc", "vvmmv", "vvmvc", "vvmvv", "vvuu_", "vvuuc", "vvuvc",
-                 "vvuvv", "vvvvc"]
+                 "vvuvv", "vvvvc", "mmmm_"]
     Road_tiles = ["mmumk", "mmuu_", "mumu_", "muuu_", "uuuu_", "vmuu_", "vumu_", "vuum_", "vuuu_", "vvuu_", "vvuuc",
                   "vvuvc", "vvuvv"]
     City_tiles = ["mvmvc", "mvmvv", "vmmm_", "vmuu_", "vmvm_", "vumu_", "vuum_", "vuuu_", "vvmm_", "vvmmc", "vvmmv",
                   "vvmvc", "vvmvv", "vvuu_", "vvuuc", "vvuvc", "vvuvv", "vvvvc"]
-    Plain_tiles = ["mmmmk"]
+    Plain_tiles = ["mmmm_"]
     Monastery_tiles = ["mmmmk", "mmumk"]
 
     Pack = [random.choice(Plain_tiles), random.choice(Monastery_tiles)]
