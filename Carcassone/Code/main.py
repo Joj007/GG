@@ -60,11 +60,60 @@ def Placeable(selected_card, location, placed_cards):  # selected_card egy card 
     else:
         return True
 
+def Is_game_over(selected_card, placed_cards):
+    if len(placed_cards)==constants.TABLE_SIZE_X*constants.TABLE_SIZE_Y:
+        print("80")
+        return True
+    for x in range(constants.TABLE_SIZE_X):
+        for y in range(constants.TABLE_SIZE_Y):
+            if Placeable(Card(choosen_card, x, y, choosen_tile), [x + 1, y + 1], cards) or Placeable(Card(choosen_card, x, y, f"{choosen_tile[1]}{choosen_tile[2]}{choosen_tile[3]}{choosen_tile[0]}{choosen_tile[4]}"), [x + 1, y + 1], cards)\
+                    or Placeable(Card(choosen_card, x, y, f"{choosen_tile[2]}{choosen_tile[3]}{choosen_tile[0]}{choosen_tile[1]}{choosen_tile[4]}"), [x + 1, y + 1], cards) or Placeable(Card(choosen_card, x, y, f"{choosen_tile[3]}{choosen_tile[0]}{choosen_tile[1]}{choosen_tile[2]}{choosen_tile[4]}"), [x + 1, y + 1], cards):
+                is_duplicate = False
+                for card in cards:
+                    if card.pos_x == x and card.pos_y == y:
+                        is_duplicate = True
+                if not is_duplicate:
+                    return False
+    return True
+
+
+
+def Create_pack():
+    All_tiles = ["mmmmk", "mmumk", "mmuu_", "mumu_", "muuu_", "mvmvc", "mvmvv", "uuuu_", "vmmm_", "vmuu_", "vmvm_",
+                 "vumu_", "vuum_", "vuuu_", "vvmm_", "vvmmc", "vvmmv", "vvmvc", "vvmvv", "vvuu_", "vvuuc", "vvuvc",
+                 "vvuvv", "vvvvc"]
+    Road_tiles = ["mmumk", "mmuu_", "mumu_", "muuu_", "uuuu_", "vmuu_", "vumu_", "vuum_", "vuuu_", "vvuu_", "vvuuc",
+                  "vvuvc", "vvuvv"]
+    City_tiles = ["mvmvc", "mvmvv", "vmmm_", "vmuu_", "vmvm_", "vumu_", "vuum_", "vuuu_", "vvmm_", "vvmmc", "vvmmv",
+                  "vvmvc", "vvmvv", "vvuu_", "vvuuc", "vvuvc", "vvuvv", "vvvvc"]
+    Plain_tiles = ["mmmmk"]
+    Monastery_tiles = ["mmmmk", "mmumk"]
+
+    Pack = [random.choice(Plain_tiles), random.choice(Monastery_tiles)]
+    for _ in range(4):
+        selected_road_tile = random.choice(Road_tiles)
+        Pack.append(selected_road_tile)
+        Road_tiles.remove(selected_road_tile)
+
+        selected_city_tile = random.choice(City_tiles)
+        Pack.append(selected_city_tile)
+        City_tiles.remove(selected_city_tile)
+
+    for _ in range(70):
+        Pack.append(random.choice(All_tiles))
+
+    return Pack
+
+
+Pack = Create_pack()
 
 
 
 
-Tiles = ["mmmmk", "mmumk", "mmuu_", "mumu_", "muuu_", "mvmvc", "mvmvv", "uuuu_", "vmmm_", "vmuu_", "vmvm_", "vumu_", "vuum_", "vuuu_", "vvmm_", "vvmmc", "vvmmv", "vvmvc", "vvmvv", "vvuu_", "vvuuc", "vvuvc", "vvuvv", "vvvvc"]
+
+
+
+
 Backgrounds = {
     "bg_wide": pygame.transform.scale(pygame.image.load(f"{path}/../Backgrounds/carcassonneBG1.jfif").convert_alpha(), (screen.get_width(), screen.get_height())),
     "bg_tall": pygame.transform.scale(pygame.image.load(f"{path}/../Backgrounds/carcassonneBG2.webp").convert_alpha(), (screen.get_width(), screen.get_height())),
@@ -90,7 +139,6 @@ class Card:
         self.image = image
         self.pos = self.pos_x, self.pos_y = x, y
         self.sides = name
-        print(image)
 
     def draw(self):
         screen.blit(self.image, (self.pos_x*image_size[0], self.pos_y*image_size[1]))
@@ -177,8 +225,9 @@ class CenterRectButton:
 
 cards = []
 buttons = [CenterRectButton(50, 10, 350, (100,0,200), [], True, "START"), CenterRectButton(50, 10, 450, (0,100,0), [], False, "SETTINGS"), CenterRectButton(50, 10, 550, (200,0,100), [], False, "EXIT")]
-choosen_tile = random.choice(Tiles)
+choosen_tile = random.choice(Pack)
 choosen_card = ImageLoader(choosen_tile)
+Pack.remove(choosen_tile)
 
 transparent_square = pygame.Surface(image_size)
 transparent_square.set_alpha(128)
@@ -200,9 +249,6 @@ while running:
 
         for event in pygame.event.get():
 
-
-
-
             if event.type == pygame.QUIT:
                 running = False
                 exit()
@@ -217,8 +263,13 @@ while running:
 
                 if grid_x + 1 <= constants.TABLE_SIZE_X and grid_y + 1 <= constants.TABLE_SIZE_Y and not is_duplicate and Placeable(Card(choosen_card, grid_x, grid_y, choosen_tile), [grid_x + 1, grid_y + 1], cards):
                     cards.append(Card(choosen_card, grid_x, grid_y, choosen_tile))
-                    choosen_tile = random.choice(Tiles)
+                    choosen_tile = random.choice(Pack)
                     choosen_card = ImageLoader(choosen_tile)
+                    Pack.remove(choosen_tile)
+                    if Is_game_over(Card(choosen_card, grid_x, grid_y, choosen_tile), cards):
+                        mode = "menu"
+                        cards = []
+                        Pack = Create_pack()
 
             elif event.type == pygame.MOUSEWHEEL:
                 if event.y == 1:
