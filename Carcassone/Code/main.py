@@ -237,7 +237,7 @@ class Card:
 
 
 class Key:
-    alma = "___"
+    new_name = "___"
 
     def __init__(self, letter, pos_x, pos_y, width, height):
         self.letter = letter
@@ -257,7 +257,7 @@ class Key:
             mouse_pos = mouse_pos_x, mouse_pos_y = pygame.mouse.get_pos()
             distance = abs(math.sqrt((mouse_pos_x-self.pos_x-self.width/2)**2 + (mouse_pos_y-self.pos_y-self.height/2)**2))
             if distance < self.width/2:
-                Key.alma += self.letter
+                Key.new_name += self.letter
                 Sounds['click'].play()
 
 
@@ -427,7 +427,7 @@ while running:
             for button in buttons:
                 button.click(event)
                 if button.to_game:
-                    Key.alma = "___"
+                    Key.new_name = "___"
                     mode = "game"
                     button.to_game = False
                     if Is_game_over(Card(choosen_card, 0, 0, choosen_tile, rotation), cards):
@@ -462,7 +462,7 @@ while running:
 
             screen.fill((30,30,30))
 
-            screen.blit(font.render(Key.alma[-3:], True, color),font.render(Key.alma[-3:], True, color).get_rect(topleft=(screen.get_width() / 2 - 125, 500)))
+            screen.blit(font.render(Key.new_name[-3:], True, color), font.render(Key.new_name[-3:], True, color).get_rect(topleft=(screen.get_width() / 2 - 125, 500)))
             screen.blit(font.render(str(Score(cards)), True, color),font.render(str(Score(cards)), True, color).get_rect(topright=(screen.get_width() / 2 + 125, 500)))
 
 
@@ -499,17 +499,17 @@ while running:
             elif event.type == pygame.KEYDOWN:
                 MusicKeyHandler(event, choosen_music)
 
-        if len(Key.alma) > 5:
-            if Key.alma[-3:] in [x[-3:] for x in Scores.keys()]:
-                if Scores[Key.alma[-3:]] < Score(cards):
-                    Scores[Key.alma[-3:]] = Score(cards)
+        if len(Key.new_name) > 5:
+            if Key.new_name[-3:] in [x[-3:] for x in Scores.keys()]:
+                if Scores[Key.new_name[-3:]] < Score(cards):
+                    Scores[Key.new_name[-3:]] = Score(cards)
                     WriteHighScore()
                     mode = "menu"
                     cards = []
                 else:
-                    Key.alma = "___"
+                    Key.new_name = "___"
             else:
-                Scores[Key.alma[-3:]] = Score(cards)
+                Scores[Key.new_name[-3:]] = Score(cards)
                 WriteHighScore()
                 mode = "menu"
                 cards = []
@@ -556,17 +556,17 @@ while running:
                 if event.key == pygame.K_ESCAPE:
                     mode = "menu"
 
-        if len(Key.alma) > 5:
-            if Key.alma[-3:] in [x[-3:] for x in Scores.keys()]:
-                if Scores[Key.alma[-3:]] < Score(cards):
-                    Scores[Key.alma[-3:]] = Score(cards)
+        if len(Key.new_name) > 5:
+            if Key.new_name[-3:] in [x[-3:] for x in Scores.keys()]:
+                if Scores[Key.new_name[-3:]] < Score(cards):
+                    Scores[Key.new_name[-3:]] = Score(cards)
                     WriteHighScore()
                     mode = "menu"
                     cards = []
                 else:
-                    Key.alma = "___"
+                    Key.new_name = "___"
             else:
-                Scores[Key.alma[-3:]] = Score(cards)
+                Scores[Key.new_name[-3:]] = Score(cards)
                 WriteHighScore()
                 mode = "menu"
                 cards = []
