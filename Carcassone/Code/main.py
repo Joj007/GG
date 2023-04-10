@@ -29,12 +29,28 @@ else:
 
 path = "../Images/Tiles"
 
+
+def SaveCurrentCard():
+    with open("../Save/CurrentCard", "w") as f:
+        f.write(choosen_tile)
+
 def SaveCurrentGame(placed_cards):
     with open("../Save/PrewGame", "w") as f:
         f.write("")
     with open("../Save/PrewGame", "a") as f:
         for card in placed_cards:
             f.write(f"{card.sides};{str(card.pos_x)};{str(card.pos_y)};{card.rotation}\n")
+    SavePack(Pack)
+    SaveCurrentCard()
+
+def SavePack(pack):
+    with open("../Save/Pack", "w") as f:
+        f.write("")
+    with open("../Save/Pack", "a") as f:
+        for card in pack:
+            f.write(f"{card}\n")
+
+
 
 def ReadPrewGame():
     cards = []
@@ -61,6 +77,20 @@ def ReadPrewGame():
 
             cards.append(Card(pygame.transform.rotate(ImageLoader(image_name), card_list[-1]), int(card_list[1]), int(card_list[2]), card_list[0], card_list[3]))
     return cards
+
+def ReadCurrentCard():
+    with open("../Save/CurrentCard", "r") as f:
+        card = f.read()
+    return card
+
+def ReadPack():
+    pack = []
+    with open("../Save/Pack", "r") as f:
+        for card in f.readlines():
+            pack.append(card.rstrip())
+    print(pack)
+    return pack
+
 
 
 def ImageLoader(file_name):
@@ -162,7 +192,10 @@ def MusicKeyHandler(event, choosen_music):
     elif event.key == pygame.K_RETURN:
         choosen_music.stop()
 
-Pack = Create_pack()
+if len(ReadPack()) == 0:
+    Pack = Create_pack()
+else:
+    Pack = ReadPack()
 
 
 
@@ -287,7 +320,10 @@ for line, line_index in zip(letters, range(len(letters))):
 
 
 buttons = [CenterRectButton(70, 10, 350, (124, 101, 66), "START"), CenterRectButton(70, 10, 450, (124, 101, 66), "LEADERBOARD"), CenterRectButton(70, 10, 550, (124, 101, 66), "EXIT")]
-choosen_tile = random.choice(Pack)
+if ReadCurrentCard() != "":
+    choosen_tile = ReadCurrentCard()
+else:
+    choosen_tile = random.choice(Pack)
 choosen_card = ImageLoader(choosen_tile)
 Pack.remove(choosen_tile)
 
