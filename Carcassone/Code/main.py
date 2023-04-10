@@ -86,7 +86,6 @@ def ReadPack():
     with open("../Save/Pack", "r") as f:
         for card in f.readlines():
             pack.append(card.rstrip())
-    print(pack)
     return pack
 
 
@@ -431,6 +430,12 @@ while running:
                     Key.alma = "___"
                     mode = "game"
                     button.to_game = False
+                    if Is_game_over(Card(choosen_card, 0, 0, choosen_tile, rotation), cards):
+                        mode = "save"
+                        Pack = Create_pack()
+                        EmptyFile("Pack")
+                        EmptyFile("PrewGame")
+                        EmptyFile("CurrentCard")
                 elif button.to_leaderboard:
                     mode = "leaderboard"
                     button.to_leaderboard = False
