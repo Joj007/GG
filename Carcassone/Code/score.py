@@ -87,19 +87,18 @@ def UtSzomszedok(cards, pos, sorrend):
     szomszedok, temp = [], []
 
     for i in sorrend:
-        match i:
-            case 1:
-                temp = list(filter(lambda x: x.pos == (pos[0]-1, pos[1]) and x.sides[1] == 'u', cards))
-                if len(temp) > 0: szomszedok.append(temp[0])
-            case 2:
-                temp = list(filter(lambda x: x.pos == (pos[0], pos[1]-1) and x.sides[2] == 'u', cards))
-                if len(temp) > 0: szomszedok.append(temp[0])
-            case 3:
-                temp = list(filter(lambda x: x.pos == (pos[0]+1, pos[1]) and x.sides[3] == 'u', cards))
-                if len(temp) > 0: szomszedok.append(temp[0])
-            case 4:
-                temp = list(filter(lambda x: x.pos == (pos[0], pos[1]+1) and x.sides[0] == 'u', cards))
-                if len(temp) > 0: szomszedok.append(temp[0])
+        if i == 1:
+            temp = list(filter(lambda x: x.pos == (pos[0] - 1, pos[1]) and x.sides[1] == 'u', cards))
+            if len(temp) > 0: szomszedok.append(temp[0])
+        elif i == 2:
+            temp = list(filter(lambda x: x.pos == (pos[0], pos[1] - 1) and x.sides[2] == 'u', cards))
+            if len(temp) > 0: szomszedok.append(temp[0])
+        elif i == 3:
+            temp = list(filter(lambda x: x.pos == (pos[0] + 1, pos[1]) and x.sides[3] == 'u', cards))
+            if len(temp) > 0: szomszedok.append(temp[0])
+        elif i == 4:
+            temp = list(filter(lambda x: x.pos == (pos[0], pos[1] + 1) and x.sides[0] == 'u', cards))
+            if len(temp) > 0: szomszedok.append(temp[0])
 
     return szomszedok
 
