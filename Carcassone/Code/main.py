@@ -1,10 +1,19 @@
 import math, os, random, pygame, constants
+import sys
+import time
 from pygame import mixer
+import collections
 
 pygame.init()
 pygame.display.set_caption('Carcassone')
 
 
+Sounds={
+    "click": mixer.Sound('../Sounds/click.wav'),
+    "wrong": mixer.Sound('../Sounds/wrong.wav')
+}
+
+Musics=[mixer.Sound('../Music/8-bit-dream-land-142093.mp3'), mixer.Sound('../Music/child-light-145463.mp3'), mixer.Sound('../Music/chill-dance-edm-laid-back-relax-tropical-lounge-melodic-143880.mp3'), mixer.Sound('../Music/chiptune-grooving-142242.mp3'), mixer.Sound('../Music/game-music-loop-2-144037.mp3'), mixer.Sound('../Music/lady-of-the-80x27s-128379.mp3'), mixer.Sound('../Music/trapped-in-the-box-quarantine-dance-instrumental-confinement-142468.mp3')]
 
 
 running = True
@@ -20,10 +29,45 @@ else:
 
 path = "../Images/Tiles"
 
+def SaveCurrentGame(placed_cards):
+    with open("../Save/PrewGame", "w") as f:
+        f.write("")
+    with open("../Save/PrewGame", "a") as f:
+        for card in placed_cards:
+            f.write(f"{card.sides};{str(card.pos_x)};{str(card.pos_y)};{card.rotation}\n")
+
+def ReadPrewGame():
+    cards = []
+    with open("../Save/PrewGame", "r") as f:
+        for card in f.readlines():
+            card_list = card.split(";")
+            card_list[-1] = int(card_list[-1].rstrip())
+            if len(card_list[1]) > 2 and card_list[1][-2] == ".":
+                card_list[1] = card_list[1][:-2]
+                card_list[2] = card_list[2][:-2]
+            rotation_copy = card_list[-1]
+            image_name = card_list[0]
+            if rotation_copy > 0:
+                while rotation_copy != 0:
+                    rotation_copy -= 90
+                    image_name = f"{image_name[3]}{image_name[0]}{image_name[1]}{image_name[2]}{image_name[4]}"
+
+
+            elif rotation_copy < 0:
+                while rotation_copy != 0:
+                    rotation_copy += 90
+                    image_name = f"{image_name[1]}{image_name[2]}{image_name[3]}{image_name[0]}{image_name[4]}"
+
+
+            cards.append(Card(pygame.transform.rotate(ImageLoader(image_name), card_list[-1]), int(card_list[1]), int(card_list[2]), card_list[0], card_list[3]))
+    return cards
+
 
 def ImageLoader(file_name):
     return pygame.transform.scale(pygame.image.load(f"{path}/{file_name}.png").convert_alpha(), image_size)
 
+def Score(kártyalista):
+    return len(kártyalista*10)
 
 def Placeable(selected_card, location, placed_cards):  # selected_card egy card class, a location egy számpár [2, 3], a placed_cards pedig egy lista a lerakott kártya classekkel
     location = [int(location[1]-1), int(location[0]-1)]
@@ -62,12 +106,11 @@ def Placeable(selected_card, location, placed_cards):  # selected_card egy card 
 
 def Is_game_over(selected_card, placed_cards):
     if len(placed_cards)==constants.TABLE_SIZE_X*constants.TABLE_SIZE_Y:
-        print("80")
         return True
     for x in range(constants.TABLE_SIZE_X):
         for y in range(constants.TABLE_SIZE_Y):
-            if Placeable(Card(choosen_card, x, y, choosen_tile), [x + 1, y + 1], cards) or Placeable(Card(choosen_card, x, y, f"{choosen_tile[1]}{choosen_tile[2]}{choosen_tile[3]}{choosen_tile[0]}{choosen_tile[4]}"), [x + 1, y + 1], cards)\
-                    or Placeable(Card(choosen_card, x, y, f"{choosen_tile[2]}{choosen_tile[3]}{choosen_tile[0]}{choosen_tile[1]}{choosen_tile[4]}"), [x + 1, y + 1], cards) or Placeable(Card(choosen_card, x, y, f"{choosen_tile[3]}{choosen_tile[0]}{choosen_tile[1]}{choosen_tile[2]}{choosen_tile[4]}"), [x + 1, y + 1], cards):
+            if Placeable(Card(choosen_card, x, y, choosen_tile, 0), [x + 1, y + 1], cards) or Placeable(Card(choosen_card, x, y, f"{choosen_tile[1]}{choosen_tile[2]}{choosen_tile[3]}{choosen_tile[0]}{choosen_tile[4]}", 0), [x + 1, y + 1], cards)\
+                    or Placeable(Card(choosen_card, x, y, f"{choosen_tile[2]}{choosen_tile[3]}{choosen_tile[0]}{choosen_tile[1]}{choosen_tile[4]}", 0), [x + 1, y + 1], cards) or Placeable(Card(choosen_card, x, y, f"{choosen_tile[3]}{choosen_tile[0]}{choosen_tile[1]}{choosen_tile[2]}{choosen_tile[4]}", 0), [x + 1, y + 1], cards):
                 is_duplicate = False
                 for card in cards:
                     if card.pos_x == x and card.pos_y == y:
@@ -76,7 +119,12 @@ def Is_game_over(selected_card, placed_cards):
                     return False
     return True
 
-
+def WriteHighScore():
+    with open("../Save/HighScores", "w") as f:
+        f.write("")
+    with open("../Save/HighScores", "a") as f:
+        for score in Scores.items():
+            f.write(f"{score[0][-3:]};{score[1]}\n")
 
 def Create_pack():
     All_tiles = ["mmmmk", "mmumk", "mmuu_", "mumu_", "muuu_", "mvmvc", "mvmvv", "uuuu_", "vmmm_", "vmuu_", "vmvm_",
@@ -104,6 +152,15 @@ def Create_pack():
 
     return Pack
 
+def MusicKeyHandler(event, choosen_music):
+    if event.key == pygame.K_KP_PLUS:
+        choosen_music.set_volume(choosen_music.get_volume() + 0.1)
+    elif event.key == pygame.K_KP_MINUS:
+        choosen_music.set_volume(choosen_music.get_volume() - 0.1)
+        if choosen_music.get_volume() < 0.11:
+         choosen_music.set_volume(0)
+    elif event.key == pygame.K_RETURN:
+        choosen_music.stop()
 
 Pack = Create_pack()
 
@@ -121,6 +178,7 @@ Backgrounds = {
     "bg_game": pygame.transform.scale(pygame.image.load(f"{path}/../Backgrounds/gameBG.jpg").convert_alpha(), (screen.get_height() if screen.get_height() > screen.get_width() else screen.get_width(), screen.get_height() if screen.get_height() > screen.get_width() else screen.get_width())),
     "icon": pygame.image.load('../Images/Backgrounds/Logo.webp'),
     "title": pygame.transform.scale(pygame.image.load('../Images/Backgrounds/Title.png'), (screen.get_width()/1.2, screen.get_width()/1.2/4)),
+    "bg_menu": pygame.transform.scale(pygame.image.load(f"{path}/../Backgrounds/MenuHatter.png").convert_alpha(), (screen.get_height(), screen.get_height())),
 }
 
 title_rect = Backgrounds['title'].get_rect(midtop=(screen.get_width()/2, 20))
@@ -135,96 +193,100 @@ elif screen.get_width() > screen.get_height():
     menu_background = Backgrounds["bg_wide"]
 
 class Card:
-    def __init__(self, image, x, y, name):
+    def __init__(self, image, x, y, name, rotation):
         self.image = image
         self.pos = self.pos_x, self.pos_y = x, y
         self.sides = name
+        self.rotation = rotation
 
     def draw(self):
         screen.blit(self.image, (self.pos_x*image_size[0], self.pos_y*image_size[1]))
 
 
-class ImageButton:
-    def __init__(self, image, pos_x, pos_y):
-        self.image = image
-        self.pos_x = pos_x
-        self.pos_y = pos_y
-        self.mode = "image"
+class Key:
+    alma = "___"
 
-    def draw(self):
-        screen.blit(self.image, (self.pos_x, self.pos_y))
-
-class RectButton:
-    def __init__(self, width, height, pos_x, pos_y, color, functions, is_start):
+    def __init__(self, letter, pos_x, pos_y, width, height):
+        self.letter = letter
+        self.pos = self.pos_x, self.pos_y = pos_x, pos_y
         self.width = width
         self.height = height
-        self.pos_x = pos_x
-        self.pos_y = pos_y
-        self.color = color
-        self.functions = functions
-        self.is_start_button = is_start
-        self.to_game = False
+        self.font = pygame.font.Font('freesansbold.ttf', int(width/2))
+        self.text = self.font.render(letter.upper(), True, (255, 255, 255))
+        self.textRect = self.text.get_rect(center=(self.pos_x+self.width/2, self.pos_y+self.height/2))
 
     def draw(self):
-        pygame.draw.rect(screen, self.color, (self.pos_x, self.pos_y, self.width, self.height))
+        pygame.draw.rect(screen, (0,0,100), (self.pos_x, self.pos_y, self.width, self.height), 0, 50)
+        screen.blit(self.text, self.textRect)
 
-    def click(self, event):
-        mouse_pos = mouse_pos_x, mouse_pos_y = pygame.mouse.get_pos()
-        if event.type == pygame.MOUSEBUTTONDOWN and self.pos_x < mouse_pos_x < self.pos_x + self.width and self.pos_y < mouse_pos_y < self.pos_y + self.height:
-            if not self.is_start_button:
-                for index in range(len(self.functions)):
-                    self.functions[index]()
-            else:
-                self.to_game = True
-
-class CircleButton:
-    def __init__(self, pos_x, pos_y, radius, color, is_start):
-        self.pos_x = pos_x
-        self.pos_y = pos_y
-        self.radius = radius
-        self.color = color
-        self.is_start_button = is_start
-        self.to_game = False
-    def draw(self):
-        pygame.draw.circle(screen, self.color, (self.pos_x, self.pos_y), self.radius)
     def click(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_pos = mouse_pos_x, mouse_pos_y = pygame.mouse.get_pos()
-            distance = abs(math.sqrt((mouse_pos_x-self.pos_x)**2 + (mouse_pos_y-self.pos_y)**2))
-            if distance < self.radius:
-                print('O')
+            distance = abs(math.sqrt((mouse_pos_x-self.pos_x-self.width/2)**2 + (mouse_pos_y-self.pos_y-self.height/2)**2))
+            if distance < self.width/2:
+                Key.alma += self.letter
+                Sounds['click'].play()
+
+
+Scores = dict()
+with open("../Save/HighScores", "r") as f:
+    for line in f:
+        line = line.split("\n")
+        for element in line:
+            if element == "":
+                continue
+            Scores[element.split(";")[0]] = int(element.split(";")[1])
+
 
 class CenterRectButton:
-    def __init__(self, width, height, pos_y, color=(100,100,100), functions=[], is_start=False, text="Start", text_size=36):
+    def __init__(self, width, height, pos_y, color=(100,100,100), text="Start", text_size=36):
         self.width = width
         self.act_width = screen.get_width()*self.width/100
         self.height = height
         self.act_height = screen.get_height()*self.height/100
         self.pos_y = pos_y
         self.color = color
-        self.functions = functions
-        self.is_start_button = is_start
         self.to_game = False
+        self.to_exit = False
+        self.to_leaderboard = False
         self.font = pygame.font.Font('freesansbold.ttf', text_size)
+        self.original_text = text
         self.text = self.font.render(text.upper(), True, (255, 255, 255))
-        self.textRect = self.text.get_rect(center=(self.act_width,self.pos_y+self.act_height/2))
+        self.textRect = self.text.get_rect(center=(screen.get_width()/2,self.pos_y+self.act_height/2))
 
     def draw(self):
-        pygame.draw.rect(screen, self.color, (self.act_width/2, self.pos_y, self.act_width, self.act_height), 0, 50)
+        pygame.draw.rect(screen, self.color, ((screen.get_width()-self.act_width)/2, self.pos_y, self.act_width, self.act_height), 0, 50)
         screen.blit(self.text, self.textRect)
 
     def click(self, event):
         mouse_pos = mouse_pos_x, mouse_pos_y = pygame.mouse.get_pos()
-        if event.type == pygame.MOUSEBUTTONDOWN and self.act_width/2 < mouse_pos_x < self.act_width/2+self.act_width and self.pos_y < mouse_pos_y < self.pos_y + self.act_height:
-            if not self.is_start_button:
-                for index in range(len(self.functions)):
-                    self.functions[index]()
-            else:
+        if event.type == pygame.MOUSEBUTTONDOWN and (screen.get_width()-self.act_width)/2 < mouse_pos_x < (screen.get_width()-self.act_width)/2+self.act_width and self.pos_y < mouse_pos_y < self.pos_y + self.act_height:
+            if self.original_text == "START":
                 self.to_game = True
+            elif self.original_text == "LEADERBOARD":
+                self.to_leaderboard = True
+            elif self.original_text == "EXIT":
+                self.to_exit = True
+            Sounds['click'].play()
 
 
-cards = []
-buttons = [CenterRectButton(50, 10, 350, (100,0,200), [], True, "START"), CenterRectButton(50, 10, 450, (0,100,0), [], False, "SETTINGS"), CenterRectButton(50, 10, 550, (200,0,100), [], False, "EXIT")]
+cards = ReadPrewGame()
+
+
+keys = []
+
+letters = [["1","2","3","4","5","6","7","8","9","0"], ["q","w","e","r","t","y","u","i","o","p"], ["a","s","d","f","g","h","j","k","l","-"], ["z","x","c","v","b","n","m","_","@","."]]
+eltolas_x = 10
+eltolas_y = 10
+hossz = screen.get_width()/len(letters[0]) - eltolas_x
+magassag = hossz
+
+for line, line_index in zip(letters, range(len(letters))):
+    for letter, letter_index in zip(line, range(len(line))):
+        keys.append(Key(letter, eltolas_x/2+letter_index*(hossz+eltolas_x), eltolas_y+line_index*(hossz+eltolas_y)+(screen.get_height()-len(letters)*(magassag+eltolas_y)-eltolas_y), hossz, magassag))
+
+
+buttons = [CenterRectButton(70, 10, 350, (124, 101, 66), "START"), CenterRectButton(70, 10, 450, (124, 101, 66), "LEADERBOARD"), CenterRectButton(70, 10, 550, (124, 101, 66), "EXIT")]
 choosen_tile = random.choice(Pack)
 choosen_card = ImageLoader(choosen_tile)
 Pack.remove(choosen_tile)
@@ -233,7 +295,18 @@ transparent_square = pygame.Surface(image_size)
 transparent_square.set_alpha(128)
 transparent_square.fill((0,0,0,128))
 
+rotation = 0
+random_music_number = random.randint(0, len(Musics) - 1)
+choosen_music = Musics[random_music_number]
+choosen_music.play()
+choosen_music.set_volume(0.5)
 while running:
+    if not mixer.get_busy():
+        random_music_number += 1
+        if random_music_number == len(Musics):
+            random_music_number = 0
+        choosen_music = Musics[random_music_number]
+        choosen_music.play()
     if mode == "game":
         bg_rect = Backgrounds["bg_game"].get_rect()
         bg_rect.center = (screen.get_width()/2,screen.get_height()/2)
@@ -242,16 +315,20 @@ while running:
         for card in cards:
             card.draw()
 
-        if len(cards) == constants.TABLE_SIZE_X * constants.TABLE_SIZE_Y:
-            running = False
 
+        if len(cards) == constants.TABLE_SIZE_X * constants.TABLE_SIZE_Y:
+            mode = "save"
 
 
         for event in pygame.event.get():
-
             if event.type == pygame.QUIT:
                 running = False
                 exit()
+
+            elif event.type == pygame.KEYDOWN:
+                MusicKeyHandler(event, choosen_music)
+                if event.key == pygame.K_ESCAPE:
+                    mode = "menu"
 
 
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -261,23 +338,29 @@ while running:
                     if card.pos_x == grid_x and card.pos_y == grid_y:
                         is_duplicate = True
 
-                if grid_x + 1 <= constants.TABLE_SIZE_X and grid_y + 1 <= constants.TABLE_SIZE_Y and not is_duplicate and Placeable(Card(choosen_card, grid_x, grid_y, choosen_tile), [grid_x + 1, grid_y + 1], cards):
-                    cards.append(Card(choosen_card, grid_x, grid_y, choosen_tile))
+                if grid_x + 1 <= constants.TABLE_SIZE_X and grid_y + 1 <= constants.TABLE_SIZE_Y and not is_duplicate and Placeable(Card(choosen_card, grid_x, grid_y, choosen_tile, rotation), [grid_x + 1, grid_y + 1], cards):
+                    cards.append(Card(choosen_card, grid_x, grid_y, choosen_tile, rotation))
+                    rotation = 0
                     choosen_tile = random.choice(Pack)
                     choosen_card = ImageLoader(choosen_tile)
                     Pack.remove(choosen_tile)
-                    if Is_game_over(Card(choosen_card, grid_x, grid_y, choosen_tile), cards):
-                        mode = "menu"
-                        cards = []
+                    if Is_game_over(Card(choosen_card, grid_x, grid_y, choosen_tile, rotation), cards):
+                        mode = "save"
                         Pack = Create_pack()
+                    SaveCurrentGame(cards)
+                    Sounds['click'].play()
+                else:
+                    Sounds['wrong'].play()
 
             elif event.type == pygame.MOUSEWHEEL:
                 if event.y == 1:
                     choosen_card = pygame.transform.rotate(choosen_card, 90)
                     choosen_tile = f"{choosen_tile[1]}{choosen_tile[2]}{choosen_tile[3]}{choosen_tile[0]}{choosen_tile[4]}"
+                    rotation += 90
                 elif event.y == -1:
                     choosen_card = pygame.transform.rotate(choosen_card, -90)
                     choosen_tile = f"{choosen_tile[3]}{choosen_tile[0]}{choosen_tile[1]}{choosen_tile[2]}{choosen_tile[4]}"
+                    rotation -= 90
 
         pos = pygame.mouse.get_pos()
         grid = grid_x, grid_y = pos[0] // image_size[0], pos[1] // image_size[0]
@@ -290,7 +373,11 @@ while running:
 
 
     elif mode == "menu":
-        pygame.draw.rect(screen, (0,50,150) ,(0,0,screen.get_width(),screen.get_height()))
+        bg_rect = Backgrounds["bg_menu"].get_rect()
+        bg_rect.center = (screen.get_width() / 2, screen.get_height() / 2)
+        screen.blit(Backgrounds["bg_menu"], bg_rect)
+
+
         screen.blit(Backgrounds["title"], title_rect)
 
         for button in buttons:
@@ -300,13 +387,137 @@ while running:
 
             for button in buttons:
                 button.click(event)
-                if button.is_start_button and button.to_game:
+                if button.to_game:
+                    Key.alma = "___"
                     mode = "game"
                     button.to_game = False
+                elif button.to_leaderboard:
+                    mode = "leaderboard"
+                    button.to_leaderboard = False
+                elif button.to_exit:
+                    sys.exit()
 
             if event.type == pygame.QUIT:
                 running = False
                 exit()
+
+            elif event.type == pygame.KEYDOWN:
+                MusicKeyHandler(event, choosen_music)
+
+
+
+
+
+
+    elif mode == "save":
+
+
+        for event in pygame.event.get():
+
+            screen.fill((30,30,30))
+            screen.blit(pygame.font.Font('freesansbold.ttf', 30).render(Key.alma[-3:], True, (255, 255, 255)),
+                        pygame.font.Font('freesansbold.ttf', 30).render(Key.alma[-3:], True, (255, 255, 255)).get_rect(topleft=(screen.get_width() / 2 - 125, 450)))
+            screen.blit(pygame.font.Font('freesansbold.ttf', 30).render(str(Score(cards)), True, (255, 255, 255)),
+                        pygame.font.Font('freesansbold.ttf', 30).render(str(Score(cards)), True, (255, 255, 255)).get_rect(topright=(screen.get_width() / 2 + 125, 450)))
+
+            dict_y = 20
+            Scores = dict(sorted(Scores.items(), key=lambda x: x[1], reverse=True))
+
+
+
+            for score in Scores.keys():
+                screen.blit(pygame.font.Font('freesansbold.ttf', 30).render(str((dict_y-20)/40+1)[:-1], True, (255, 255, 255)),
+                            pygame.font.Font('freesansbold.ttf', 30).render(str((dict_y-20)/40+1)[:-1], True, (255, 255, 255)).get_rect(topleft=(10, dict_y)))
+
+                screen.blit(pygame.font.Font('freesansbold.ttf', 30).render(score[-3:], True, (255, 255, 255)),
+                            pygame.font.Font('freesansbold.ttf', 30).render(score[-3:], True, (255, 255, 255)).get_rect(topleft=(screen.get_width() / 2 - 125, dict_y)))
+
+                screen.blit(pygame.font.Font('freesansbold.ttf', 30).render(str(Scores[score]), True, (255, 255, 255)),
+                            pygame.font.Font('freesansbold.ttf', 30).render(str(Scores[score]), True, (255, 255, 255)).get_rect(topright=(screen.get_width() / 2 + 125, dict_y)))
+                dict_y += 40
+                if (dict_y-20)/40 > 9:
+                    break
+
+            for key in keys:
+                key.draw()
+                key.click(event)
+
+            if event.type == pygame.QUIT:
+                running = False
+                exit()
+
+            elif event.type == pygame.KEYDOWN:
+                MusicKeyHandler(event, choosen_music)
+
+        if len(Key.alma) > 5:
+            if Key.alma[-3:] in [x[-3:] for x in Scores.keys()]:
+                if Scores[Key.alma[-3:]] < Score(cards):
+                    Scores[Key.alma[-3:]] = Score(cards)
+                    WriteHighScore()
+                    mode = "menu"
+                    cards = []
+                else:
+                    Key.alma = "___"
+            else:
+                Scores[Key.alma[-3:]] = Score(cards)
+                WriteHighScore()
+                mode = "menu"
+                cards = []
+
+    elif mode == "leaderboard":
+
+
+        for event in pygame.event.get():
+
+            screen.fill((30,30,30))
+
+
+            dict_y = 10
+            Scores = dict(sorted(Scores.items(), key=lambda x: x[1], reverse=True))
+
+
+
+            for score in Scores.keys():
+                screen.blit(pygame.font.Font('freesansbold.ttf', 30).render(str((dict_y-10)/40+1)[:-1], True, (255, 255, 255)),
+                            pygame.font.Font('freesansbold.ttf', 30).render(str((dict_y-10)/40+1)[:-1], True, (255, 255, 255)).get_rect(topleft=(10, dict_y)))
+
+                screen.blit(pygame.font.Font('freesansbold.ttf', 30).render(score[-3:], True, (255, 255, 255)),
+                            pygame.font.Font('freesansbold.ttf', 30).render(score[-3:], True, (255, 255, 255)).get_rect(topleft=(screen.get_width() / 2 - 125, dict_y)))
+
+                screen.blit(pygame.font.Font('freesansbold.ttf', 30).render(str(Scores[score]), True, (255, 255, 255)),
+                            pygame.font.Font('freesansbold.ttf', 30).render(str(Scores[score]), True, (255, 255, 255)).get_rect(topright=(screen.get_width() / 2 + 125, dict_y)))
+                dict_y += 40
+                if (dict_y-10)/40 > 20:
+                    break
+
+
+            if event.type == pygame.QUIT:
+                running = False
+                exit()
+
+            elif event.type == pygame.KEYDOWN:
+                MusicKeyHandler(event, choosen_music)
+                if event.key == pygame.K_ESCAPE:
+                    mode = "menu"
+
+        if len(Key.alma) > 5:
+            if Key.alma[-3:] in [x[-3:] for x in Scores.keys()]:
+                if Scores[Key.alma[-3:]] < Score(cards):
+                    Scores[Key.alma[-3:]] = Score(cards)
+                    WriteHighScore()
+                    mode = "menu"
+                    cards = []
+                else:
+                    Key.alma = "___"
+            else:
+                Scores[Key.alma[-3:]] = Score(cards)
+                WriteHighScore()
+                mode = "menu"
+                cards = []
+
+
+
+
 
 
     pygame.display.update()
