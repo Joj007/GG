@@ -411,31 +411,36 @@ while running:
 
     elif mode == "save":
 
-
+        color = (255, 255, 255)
+        font = pygame.font.Font('freesansbold.ttf', 30)
         for event in pygame.event.get():
 
             screen.fill((30,30,30))
-            screen.blit(pygame.font.Font('freesansbold.ttf', 30).render(Key.alma[-3:], True, (255, 255, 255)),
-                        pygame.font.Font('freesansbold.ttf', 30).render(Key.alma[-3:], True, (255, 255, 255)).get_rect(topleft=(screen.get_width() / 2 - 125, 450)))
-            screen.blit(pygame.font.Font('freesansbold.ttf', 30).render(str(Score(cards)), True, (255, 255, 255)),
-                        pygame.font.Font('freesansbold.ttf', 30).render(str(Score(cards)), True, (255, 255, 255)).get_rect(topright=(screen.get_width() / 2 + 125, 450)))
 
-            dict_y = 20
+            screen.blit(font.render(Key.alma[-3:], True, color),font.render(Key.alma[-3:], True, color).get_rect(topleft=(screen.get_width() / 2 - 125, 500)))
+            screen.blit(font.render(str(Score(cards)), True, color),font.render(str(Score(cards)), True, color).get_rect(topright=(screen.get_width() / 2 + 125, 500)))
+
+
+            dict_y = 10
             Scores = dict(sorted(Scores.items(), key=lambda x: x[1], reverse=True))
 
 
 
             for score in Scores.keys():
-                screen.blit(pygame.font.Font('freesansbold.ttf', 30).render(str((dict_y-20)/40+1)[:-1], True, (255, 255, 255)),
-                            pygame.font.Font('freesansbold.ttf', 30).render(str((dict_y-20)/40+1)[:-1], True, (255, 255, 255)).get_rect(topleft=(10, dict_y)))
+                font_place = font.render(str((dict_y - 10) / 40 + 1)[:-1], True, color)
+                font_place_rect = font_place.get_rect(topleft=(10, dict_y))
 
-                screen.blit(pygame.font.Font('freesansbold.ttf', 30).render(score[-3:], True, (255, 255, 255)),
-                            pygame.font.Font('freesansbold.ttf', 30).render(score[-3:], True, (255, 255, 255)).get_rect(topleft=(screen.get_width() / 2 - 125, dict_y)))
+                font_name = font.render(score[-3:], True, color)
+                font_name_rect = font_name.get_rect(topleft=(screen.get_width() / 2 - 125, dict_y))
 
-                screen.blit(pygame.font.Font('freesansbold.ttf', 30).render(str(Scores[score]), True, (255, 255, 255)),
-                            pygame.font.Font('freesansbold.ttf', 30).render(str(Scores[score]), True, (255, 255, 255)).get_rect(topright=(screen.get_width() / 2 + 125, dict_y)))
+                font_point = font.render(str(Scores[score]), True, color)
+                font_point_rect = font_point.get_rect(topright=(screen.get_width() / 2 + 125, dict_y))
+
+                screen.blit(font_place, font_place_rect)
+                screen.blit(font_name, font_name_rect)
+                screen.blit(font_point, font_point_rect)
                 dict_y += 40
-                if (dict_y-20)/40 > 9:
+                if (dict_y-10)/40 > 9:
                     break
 
             for key in keys:
@@ -475,17 +480,23 @@ while running:
             dict_y = 10
             Scores = dict(sorted(Scores.items(), key=lambda x: x[1], reverse=True))
 
-
-
+            color = (255, 255, 255)
+            font = pygame.font.Font('freesansbold.ttf', 30)
             for score in Scores.keys():
-                screen.blit(pygame.font.Font('freesansbold.ttf', 30).render(str((dict_y-10)/40+1)[:-1], True, (255, 255, 255)),
-                            pygame.font.Font('freesansbold.ttf', 30).render(str((dict_y-10)/40+1)[:-1], True, (255, 255, 255)).get_rect(topleft=(10, dict_y)))
+                font_place = font.render(str((dict_y-10)/40+1)[:-1], True, color)
+                font_place_rect = font_place.get_rect(topleft=(10, dict_y))
 
-                screen.blit(pygame.font.Font('freesansbold.ttf', 30).render(score[-3:], True, (255, 255, 255)),
-                            pygame.font.Font('freesansbold.ttf', 30).render(score[-3:], True, (255, 255, 255)).get_rect(topleft=(screen.get_width() / 2 - 125, dict_y)))
+                font_name = font.render(score[-3:], True, color)
+                font_name_rect = font_name.get_rect(topleft=(screen.get_width() / 2 - 125, dict_y))
 
-                screen.blit(pygame.font.Font('freesansbold.ttf', 30).render(str(Scores[score]), True, (255, 255, 255)),
-                            pygame.font.Font('freesansbold.ttf', 30).render(str(Scores[score]), True, (255, 255, 255)).get_rect(topright=(screen.get_width() / 2 + 125, dict_y)))
+                font_point = font.render(str(Scores[score]), True, color)
+                font_point_rect = font_point.get_rect(topright=(screen.get_width() / 2 + 125, dict_y))
+
+
+                screen.blit(font_place, font_place_rect)
+                screen.blit(font_name, font_name_rect)
+                screen.blit(font_point, font_point_rect)
+
                 dict_y += 40
                 if (dict_y-10)/40 > 20:
                     break
