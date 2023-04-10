@@ -1,4 +1,4 @@
-import math, os, random, pygame, constants
+import math, os, random, pygame, constants, score
 import sys
 import time
 from pygame import mixer
