@@ -35,8 +35,7 @@ def SaveCurrentCard():
         f.write(choosen_tile)
 
 def SaveCurrentGame(placed_cards):
-    with open("../Save/PrewGame", "w") as f:
-        f.write("")
+    EmptyFile("PrewGame")
     with open("../Save/PrewGame", "a") as f:
         for card in placed_cards:
             f.write(f"{card.sides};{str(card.pos_x)};{str(card.pos_y)};{card.rotation}\n")
@@ -44,8 +43,7 @@ def SaveCurrentGame(placed_cards):
     SaveCurrentCard()
 
 def SavePack(pack):
-    with open("../Save/Pack", "w") as f:
-        f.write("")
+    EmptyFile("Pack")
     with open("../Save/Pack", "a") as f:
         for card in pack:
             f.write(f"{card}\n")
@@ -92,6 +90,9 @@ def ReadPack():
     return pack
 
 
+def EmptyFile(file):
+    with open(f"../Save/{file}", "w") as f:
+        f.write("")
 
 def ImageLoader(file_name):
     return pygame.transform.scale(pygame.image.load(f"{path}/{file_name}.png").convert_alpha(), image_size)
@@ -383,6 +384,9 @@ while running:
                     if Is_game_over(Card(choosen_card, grid_x, grid_y, choosen_tile, rotation), cards):
                         mode = "save"
                         Pack = Create_pack()
+                        EmptyFile("Pack")
+                        EmptyFile("PrewGame")
+                        EmptyFile("CurrentCard")
                     SaveCurrentGame(cards)
                     Sounds['click'].play()
                 else:
