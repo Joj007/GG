@@ -1,4 +1,4 @@
-import math, os, random, pygame, constants, score
+import math, os, random, pygame, constants
 import sys
 import time
 from pygame import mixer
@@ -13,7 +13,12 @@ Sounds={
     "wrong": mixer.Sound('../Sounds/wrong.wav')
 }
 
-Musics=[mixer.Sound('../Music/8-bit-dream-land-142093.mp3'), mixer.Sound('../Music/child-light-145463.mp3'), mixer.Sound('../Music/chill-dance-edm-laid-back-relax-tropical-lounge-melodic-143880.mp3'), mixer.Sound('../Music/chiptune-grooving-142242.mp3'), mixer.Sound('../Music/game-music-loop-2-144037.mp3'), mixer.Sound('../Music/lady-of-the-80x27s-128379.mp3'), mixer.Sound('../Music/trapped-in-the-box-quarantine-dance-instrumental-confinement-142468.mp3')]
+theme = "Medieval"
+music_path = f'../Music/{theme}/'
+print()
+Musics=[]
+for music in os.listdir(music_path):
+    Musics.append(mixer.Sound(f"{music_path}{music}"))
 
 
 running = True
@@ -27,7 +32,7 @@ if screen.get_width()/constants.TABLE_SIZE_X > screen.get_height()/constants.TAB
 else:
     image_size = [screen.get_width()/constants.TABLE_SIZE_X, screen.get_width()/constants.TABLE_SIZE_X]
 
-path = "../Images/Tiles"
+image_path = "../Images/Tiles"
 
 
 def SaveCurrentCard():
@@ -94,7 +99,7 @@ def EmptyFile(file):
         f.write("")
 
 def ImageLoader(file_name):
-    return pygame.transform.scale(pygame.image.load(f"{path}/{file_name}.png").convert_alpha(), image_size)
+    return pygame.transform.scale(pygame.image.load(f"{image_path}/{file_name}.png").convert_alpha(), image_size)
 
 def Score(kártyalista):
     return len(kártyalista*10)
@@ -205,13 +210,13 @@ else:
 
 
 Backgrounds = {
-    "bg_wide": pygame.transform.scale(pygame.image.load(f"{path}/../Backgrounds/carcassonneBG1.jfif").convert_alpha(), (screen.get_width(), screen.get_height())),
-    "bg_tall": pygame.transform.scale(pygame.image.load(f"{path}/../Backgrounds/carcassonneBG2.webp").convert_alpha(), (screen.get_width(), screen.get_height())),
-    "bg_square": pygame.transform.scale(pygame.image.load(f"{path}/../Backgrounds/carcassonneBG3.jpg").convert_alpha(), (screen.get_width(), screen.get_height())),
-    "bg_game": pygame.transform.scale(pygame.image.load(f"{path}/../Backgrounds/gameBG.jpg").convert_alpha(), (screen.get_height() if screen.get_height() > screen.get_width() else screen.get_width(), screen.get_height() if screen.get_height() > screen.get_width() else screen.get_width())),
+    "bg_wide": pygame.transform.scale(pygame.image.load(f"{image_path}/../Backgrounds/carcassonneBG1.jfif").convert_alpha(), (screen.get_width(), screen.get_height())),
+    "bg_tall": pygame.transform.scale(pygame.image.load(f"{image_path}/../Backgrounds/carcassonneBG2.webp").convert_alpha(), (screen.get_width(), screen.get_height())),
+    "bg_square": pygame.transform.scale(pygame.image.load(f"{image_path}/../Backgrounds/carcassonneBG3.jpg").convert_alpha(), (screen.get_width(), screen.get_height())),
+    "bg_game": pygame.transform.scale(pygame.image.load(f"{image_path}/../Backgrounds/gameBG.jpg").convert_alpha(), (screen.get_height() if screen.get_height() > screen.get_width() else screen.get_width(), screen.get_height() if screen.get_height() > screen.get_width() else screen.get_width())),
     "icon": pygame.image.load('../Images/Backgrounds/Logo.webp'),
     "title": pygame.transform.scale(pygame.image.load('../Images/Backgrounds/Title.png'), (screen.get_width()/1.2, screen.get_width()/1.2/4)),
-    "bg_menu": pygame.transform.scale(pygame.image.load(f"{path}/../Backgrounds/MenuHatter.png").convert_alpha(), (screen.get_height(), screen.get_height())),
+    "bg_menu": pygame.transform.scale(pygame.image.load(f"{image_path}/../Backgrounds/MenuHatter.png").convert_alpha(), (screen.get_height(), screen.get_height())),
 }
 
 title_rect = Backgrounds['title'].get_rect(midtop=(screen.get_width()/2, 20))
