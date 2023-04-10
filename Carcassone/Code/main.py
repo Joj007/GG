@@ -3,6 +3,7 @@ import sys
 import time
 from pygame import mixer
 import collections
+import Score
 
 pygame.init()
 pygame.display.set_caption('Carcassone')
@@ -102,9 +103,6 @@ def EmptyFile(file):
 
 def ImageLoader(file_name):
     return pygame.transform.scale(pygame.image.load(f"{image_path}/{file_name}.png").convert_alpha(), image_size)
-
-def Score(kártyalista):
-    return len(kártyalista*10)
 
 def Placeable(selected_card, location, placed_cards):  # selected_card egy card class, a location egy számpár [2, 3], a placed_cards pedig egy lista a lerakott kártya classekkel
     location = [int(location[1]-1), int(location[0]-1)]
@@ -470,7 +468,7 @@ while running:
             screen.fill((30,30,30))
 
             screen.blit(font.render(Key.new_name[-3:], True, color), font.render(Key.new_name[-3:], True, color).get_rect(topleft=(screen.get_width() / 2 - 125, 500)))
-            screen.blit(font.render(str(Score(cards)), True, color),font.render(str(Score(cards)), True, color).get_rect(topright=(screen.get_width() / 2 + 125, 500)))
+            screen.blit(font.render(str(Score.Score(cards)), True, color),font.render(str(Score.Score(cards)), True, color).get_rect(topright=(screen.get_width() / 2 + 125, 500)))
 
 
             dict_y = 10
@@ -508,15 +506,15 @@ while running:
 
         if len(Key.new_name) > 5:
             if Key.new_name[-3:] in [x[-3:] for x in Scores.keys()]:
-                if Scores[Key.new_name[-3:]] < Score(cards):
-                    Scores[Key.new_name[-3:]] = Score(cards)
+                if Scores[Key.new_name[-3:]] < Score.Score(cards):
+                    Scores[Key.new_name[-3:]] = Score.Score(cards)
                     WriteHighScore()
                     mode = "menu"
                     cards = []
                 else:
                     Key.new_name = "___"
             else:
-                Scores[Key.new_name[-3:]] = Score(cards)
+                Scores[Key.new_name[-3:]] = Score.Score(cards)
                 WriteHighScore()
                 mode = "menu"
                 cards = []
@@ -565,15 +563,15 @@ while running:
 
         if len(Key.new_name) > 5:
             if Key.new_name[-3:] in [x[-3:] for x in Scores.keys()]:
-                if Scores[Key.new_name[-3:]] < Score(cards):
-                    Scores[Key.new_name[-3:]] = Score(cards)
+                if Scores[Key.new_name[-3:]] < Score.Score(cards):
+                    Scores[Key.new_name[-3:]] = Score.Score(cards)
                     WriteHighScore()
                     mode = "menu"
                     cards = []
                 else:
                     Key.new_name = "___"
             else:
-                Scores[Key.new_name[-3:]] = Score(cards)
+                Scores[Key.new_name[-3:]] = Score.Score(cards)
                 WriteHighScore()
                 mode = "menu"
                 cards = []
