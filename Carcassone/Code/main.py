@@ -59,6 +59,8 @@ def ReadPrewGame():
     cards = []
     with open("../Save/PrewGame", "r") as f:
         for card in f.readlines():
+            if card == "\n":
+                continue
             card_list = card.split(";")
             card_list[-1] = int(card_list[-1].rstrip())
             if len(card_list[1]) > 2 and card_list[1][-2] == ".":
