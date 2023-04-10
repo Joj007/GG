@@ -1,0 +1,78 @@
+*{
+    margin: 0px;
+}
+
+@font-face {
+    font-family: "CarcassFont";
+    src: url("font/cimfont.ttf");
+    }
+
+@font-face {
+    font-family: "SzovegFont";
+    src: url("font/RINGM___.TTF");
+    }
+
+body {
+    background-image: url(képek/hatter1.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+#focim{
+    font-size: 100px;
+    letter-spacing: 30px;
+    width: 800px;
+    height: 300px;
+    margin: auto;
+    margin-top: -30px;
+    padding-left: 90px;
+    font-family: CarcassFont;
+}
+
+#cimhatter{
+    margin-left: -300px;
+    margin-bottom: -240px;
+    width: 1300px;
+    height: 320px;
+}
+
+#container{
+    max-width: 1050px;
+    min-width: 800px;
+    width: 80%;
+    height: 1000px;
+    margin: auto;
+    padding-top: 180px;
+}
+
+#texthatter{
+    width: 80%;
+    height: 1150px;
+    max-width: 1050px;
+    min-width: 800px;
+}
+
+#kephatter{
+    width: 100%;
+    height: 0px;
+    text-align: center;
+}
+
+.content-block{
+    padding-left: 140px;
+    padding-right: 140px;
+    margin-bottom: 100px;
+    text-align: justify;
+    font-family: SzovegFont;
+}
+
+.cim{
+    font-size: 45px;
+    margin: 10px;
+    width: 100%;
+    text-align: center;
+}
+
+.content{
+    font-size: 20px;
+}
