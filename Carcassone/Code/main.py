@@ -16,7 +16,6 @@ Sounds={
 
 theme = "Medieval"
 music_path = f'../Music/{theme}/'
-print()
 Musics=[]
 for music in os.listdir(music_path):
     Musics.append(mixer.Sound(f"{music_path}{music}"))
@@ -140,8 +139,9 @@ def Placeable(selected_card, location, placed_cards):  # selected_card egy card 
         return True
 
 def Is_game_over(selected_card, placed_cards):
+    list_of_placeable_tiles = []
     if len(placed_cards)==constants.TABLE_SIZE_X*constants.TABLE_SIZE_Y:
-        return True
+        return (True, list_of_placeable_tiles)
     for x in range(constants.TABLE_SIZE_X):
         for y in range(constants.TABLE_SIZE_Y):
             if Placeable(Card(choosen_card, x, y, choosen_tile, 0), [x + 1, y + 1], cards) or Placeable(Card(choosen_card, x, y, f"{choosen_tile[1]}{choosen_tile[2]}{choosen_tile[3]}{choosen_tile[0]}{choosen_tile[4]}", 0), [x + 1, y + 1], cards)\
@@ -151,8 +151,11 @@ def Is_game_over(selected_card, placed_cards):
                     if card.pos_x == x and card.pos_y == y:
                         is_duplicate = True
                 if not is_duplicate:
-                    return False
-    return True
+                    list_of_placeable_tiles.append((x,y))
+    if len(list_of_placeable_tiles) > 0:
+        return (False, list_of_placeable_tiles)
+    else:
+        return (True, list_of_placeable_tiles)
 
 def WriteHighScore():
     with open("../Save/HighScores", "w") as f:
@@ -196,6 +199,14 @@ def MusicKeyHandler(event, choosen_music):
          choosen_music.set_volume(0)
     elif event.key == pygame.K_RETURN:
         choosen_music.stop()
+
+def ColorFreeSpaces(free_spaces):
+    transparent_square = pygame.Surface((int(image_size[0])-10, int(image_size[1])-10))
+    transparent_square.set_alpha(64)
+    transparent_square.fill((0, 255, 0, 128))
+    for free_space in free_spaces:
+        screen.blit(transparent_square, (free_space[0]*constants.SCREEN_SIZE_BASE+5, free_space[1]*constants.SCREEN_SIZE_BASE+5))
+
 
 if len(ReadPack()) == 0:
     Pack = Create_pack()
@@ -341,6 +352,10 @@ random_music_number = random.randint(0, len(Musics) - 1)
 choosen_music = Musics[random_music_number]
 choosen_music.play()
 choosen_music.set_volume(0.5)
+
+free_spaces = Is_game_over(Card(choosen_card, 0, 0, choosen_tile, rotation), cards)[1]
+
+is_color = False
 while running:
     if not mixer.get_busy():
         random_music_number += 1
@@ -352,6 +367,10 @@ while running:
         bg_rect = Backgrounds["bg_game"].get_rect()
         bg_rect.center = (screen.get_width()/2,screen.get_height()/2)
         screen.blit(Backgrounds["bg_game"], bg_rect)
+
+        if is_color:
+            ColorFreeSpaces(free_spaces)
+
 
         for card in cards:
             card.draw()
@@ -370,6 +389,12 @@ while running:
                 MusicKeyHandler(event, choosen_music)
                 if event.key == pygame.K_ESCAPE:
                     mode = "menu"
+                elif event.key == pygame.K_LCTRL:
+                    if is_color:
+                        is_color = False
+                    else:
+                        is_color = True
+
 
 
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -385,13 +410,14 @@ while running:
                     choosen_tile = random.choice(Pack)
                     choosen_card = ImageLoader(choosen_tile)
                     Pack.remove(choosen_tile)
-                    if Is_game_over(Card(choosen_card, grid_x, grid_y, choosen_tile, rotation), cards):
+                    if Is_game_over(Card(choosen_card, grid_x, grid_y, choosen_tile, rotation), cards)[0]:
                         mode = "save"
                         Pack = Create_pack()
                         EmptyFile("Pack")
                         EmptyFile("PrewGame")
                         EmptyFile("CurrentCard")
                     SaveCurrentGame(cards)
+                    free_spaces = Is_game_over(Card(choosen_card, grid_x, grid_y, choosen_tile, rotation), cards)[1]
                     Sounds['click'].play()
                 else:
                     Sounds['wrong'].play()
@@ -435,7 +461,7 @@ while running:
                     Key.new_name = "___"
                     mode = "game"
                     button.to_game = False
-                    if Is_game_over(Card(choosen_card, 0, 0, choosen_tile, rotation), cards):
+                    if Is_game_over(Card(choosen_card, 0, 0, choosen_tile, rotation), cards)[0]:
                         mode = "save"
                         Pack = Create_pack()
                         EmptyFile("Pack")
