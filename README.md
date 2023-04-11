@@ -4,6 +4,7 @@
 >- Az indításhoz le kell tölteni a **pygame** nevű modult, mert főleg azzal készült
 >- Fejlesztői környeztként a **Pycharm**ot használtuk, de **Visual Studio Code**ban is megy a megfelelő modulokkal
 >- A játékot a **Carcassone/Code/main.py**-al lehet indítani
+>- A **pygame**-et ezzel a paranccsal lehet telepíteni: ``` python -m pip install -U pygame==2.3.0 --user ```
 >>## Irányítás⠀
 >>### Játék
 >>- Elemek lehelyezése: **bal egérgomb**
