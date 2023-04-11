@@ -16,7 +16,7 @@ body {
     background-image: url(képek/hatter1.png);
     background-repeat: no-repeat;
     background-size: cover;
-    margin-bottom: 80px;
+    margin-bottom: 30px;
 }
 
 #focim{
@@ -48,7 +48,7 @@ body {
 
 #texthatter{
     width: 80%;
-    height: 1350px;
+    height: 1850px;
     max-width: 1050px;
     min-width: 800px;
 }
@@ -84,7 +84,7 @@ body {
 }
 
 footer{
-    margin-top: 180px;
+    margin-top: 670px;
     margin-bottom: 10px;
     width: 100%;
     text-align: center;
@@ -101,4 +101,23 @@ footer{
 .pelda{
     height: 300px;
     margin-left: 130px;
+}
+
+li{
+    margin-bottom: 10px;
+}
+
+.iranyitas{
+    display: inline-block;
+    width: 400px;
+}
+
+#iranyitasok{
+    position: absolute;
+}
+
+.alcim{
+    list-style: none;
+    font-size: 25px;
+    margin-top: 35px;
 }
