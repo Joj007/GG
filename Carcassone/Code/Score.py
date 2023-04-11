@@ -12,20 +12,23 @@ def Score(cards):
 
 
 def VarosPont(cards):
-    varos_lista, varos_reszek = [], 0
+    varos_lista, varos_reszek, cimer = [], 0, 0
 
     for kartya in cards:
         if 'v' in kartya.sides:
             if kartya.sides[-1] in ['v', 'c']:
                 varos_lista = VarosBejar(kartya, varos_lista, cards)
                 varos_reszek += 1
+                if kartya.sides[-1] == 'c':
+                    cimer += 1
+
             else:
                 for index in range(4):
                     if kartya.sides[index] == 'v':
                         varos_lista = VarosBejar(kartya, varos_lista, cards, index)
                         varos_reszek += 1
 
-    return varos_reszek * 2 + len([pos for sublist in Ellenorzes(varos_lista) for pos in sublist]) * 5
+    return (varos_reszek + cimer) * 2 + len([pos for sublist in Ellenorzes(varos_lista) for pos in sublist]) * 5
 
 def VarosBejar(kartya, varos_lista, cards, kezdo_irany = None):
     megvizsgalt, vizsgalandok = [], [kartya]
