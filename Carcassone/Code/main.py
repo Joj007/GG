@@ -1,4 +1,6 @@
 import math, os, random, pygame, constants
+import pathlib
+import webbrowser
 import sys
 import time
 from pygame import mixer
@@ -332,6 +334,7 @@ class CenterRectButton:
         self.to_leaderboard = False
         self.to_next_playlist = False
         self.to_next_background_theme = False
+        self.to_website = False
         self.font = pygame.font.Font('freesansbold.ttf', text_size)
         self.original_text = text
         self.text = self.font.render(text.upper(), True, (255, 255, 255))
@@ -362,6 +365,8 @@ class CenterRectButton:
                 self.to_next_playlist = True
             elif self.original_text == "NEXT THEME":
                 self.to_next_background_theme = True
+            elif self.original_text == "WEBSITE":
+                self.to_website = True
             Sounds['click'].play()
         elif (screen.get_width()-self.act_width)/2 < mouse_pos_x < (screen.get_width()-self.act_width)/2+self.act_width and self.pos_y < mouse_pos_y < self.pos_y + self.act_height:
             self.color = button_hover_colors[selected_background_theme_number]
@@ -383,7 +388,7 @@ for line, line_index in zip(letters, range(len(letters))):
     for letter, letter_index in zip(line, range(len(line))):
         keys.append(Key(letter, eltolas_x/2+letter_index*(hossz+eltolas_x), eltolas_y+line_index*(hossz+eltolas_y)+(screen.get_height()-len(letters)*(magassag+eltolas_y)-eltolas_y), hossz, magassag))
 
-setting_buttons = [CenterRectButton(70, 10, 350, (124, 101, 66), "NEXT THEME"), CenterRectButton(70, 10, 450, (124, 101, 66), "NEXT PLAYLIST"), CenterRectButton(70, 10, 550, (124, 101, 66), "BACK")]
+setting_buttons = [CenterRectButton(70, 10, 350, (124, 101, 66), "NEXT THEME"), CenterRectButton(70, 10, 450, (124, 101, 66), "NEXT PLAYLIST"), CenterRectButton(70, 10, 550, (124, 101, 66), "WEBSITE"), CenterRectButton(70, 10, 650, (124, 101, 66), "BACK")]
 menu_buttons = [CenterRectButton(70, 10, 350, (124, 101, 66), "START"),CenterRectButton(70, 10, 450, (124, 101, 66), "SETTINGS"), CenterRectButton(70, 10, 550, (124, 101, 66), "LEADERBOARD"), CenterRectButton(70, 10, 650, (124, 101, 66), "EXIT")]
 
 if ReadCurrentCard() != "":
@@ -731,6 +736,10 @@ while running:
                         button.color = button_colors[selected_background_theme_number]
 
                     pygame.display.set_caption(f"Selected theme: {background_theme}")
+                elif button.to_website:
+                    print("Coming soon!")
+                    webbrowser.open_new_tab(("https://github.com/Joj007/GG"))
+                    button.to_website = False
 
 
 
