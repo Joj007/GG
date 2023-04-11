@@ -231,6 +231,8 @@ def HoverLine(length):
     transparent_square = pygame.Surface((screen.get_width()-20, 40))
     transparent_square.set_alpha(64)
     transparent_square.fill((125, 125, 125, 50))
+    if len(Scores) < length:
+        length = len(Scores)
     if mouse_y//40 < length:
         screen.blit(transparent_square, (10, mouse_y//40*40+5))
 
@@ -662,6 +664,13 @@ while running:
                 MusicKeyHandler(event, choosen_music)
                 if event.key == pygame.K_ESCAPE:
                     mode = "menu"
+                elif event.key == pygame.K_DELETE:
+                    EmptyFile("CurrentCard")
+                    EmptyFile("HighScores")
+                    EmptyFile("Pack")
+                    EmptyFile("PrewGame")
+                    sys.exit()
+
 
         if len(Key.new_name) > 5:
             if Key.new_name[-3:] in [x[-3:] for x in Scores.keys()]:
