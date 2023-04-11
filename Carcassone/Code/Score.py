@@ -4,6 +4,16 @@ def Score(cards):
     kolostor = KolostorPont(cards)
     befejezett_tabla = 10 if len(cards) == 40 else 0
 
+    print(f"\nVáros pont: {varos}\nÚt pont: {ut}\nKolostor pont: {kolostor}\nBefejezett pálya pont: {befejezett_tabla}\n-----------------\nÖsszesen: {varos+ut+kolostor+befejezett_tabla}")
+
+    print("\n\
+A városok értéke annyiszor 2 pont, ahány kártyából áll.                  X\n\
+Egy befejezett városért plusz 5 pont jár.                                X\n\
+Az utak értéke annyiszor 1 pont, ahány kártyából áll.                    ✓\n\
+Egy befejezett útért plusz 2 pont jár.                                   ✓\n\
+A kolostor kártya annyi pontot ér, ahány szomszédja van (max. 8).        ✓\n\
+Ha a játék úgy ért véget, hogy betelt a játéklap, akkor plusz 10 pont.   ✓")
+
     return varos+ut+kolostor+befejezett_tabla
 
 def VarosPont(cards):
