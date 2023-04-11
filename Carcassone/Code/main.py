@@ -224,6 +224,15 @@ def ColorFreeSpaces(free_spaces):
     for free_space in free_spaces:
         screen.blit(transparent_square, (free_space[0]*constants.SCREEN_SIZE_BASE+5, free_space[1]*constants.SCREEN_SIZE_BASE+5))
 
+def HoverLine(length):
+    mouse = mouse_x, mouse_y = pygame.mouse.get_pos()
+    transparent_square = pygame.Surface((screen.get_width()-20, 40))
+    transparent_square.set_alpha(64)
+    transparent_square.fill((125, 125, 125, 50))
+    if mouse_y//40 < length:
+        screen.blit(transparent_square, (10, mouse_y//40*40+5))
+
+
 # Új pakli generálása, illetve előző pakli betöltése
 if len(ReadPack()) == 0:
     Pack = Create_pack()
@@ -242,12 +251,14 @@ selected_background_theme_number = 0
 background_theme = background_themes[selected_background_theme_number]
 button_colors = [(124, 101, 66),(50,50,255)]
 button_hover_colors = [(154, 131, 96),(80,80,255)]
+keyboard_colors=[[(0,0,0),(255,255,255)], [(50,50,255),(255,255,255)]]
 
 Backgrounds = {
     "bg_game": pygame.transform.scale(pygame.image.load(f"{image_path}/../Backgrounds/{background_theme}/gameBG.jpg").convert_alpha(), (screen.get_height() if screen.get_height() > screen.get_width() else screen.get_width(), screen.get_height() if screen.get_height() > screen.get_width() else screen.get_width())),
     "icon": pygame.image.load(f'../Images/Backgrounds/{background_theme}/Logo.webp'),
     "title": pygame.transform.scale(pygame.image.load(f'../Images/Backgrounds/{background_theme}/Title.png'), (screen.get_width()/1.2, screen.get_width()/1.2/4)),
     "bg_menu": pygame.transform.scale(pygame.image.load(f"{image_path}/../Backgrounds/{background_theme}/MenuHatter.png").convert_alpha(), (screen.get_height(), screen.get_height())),
+    "leaderboardBG": pygame.transform.scale(pygame.image.load(f"{image_path}/../Backgrounds/{background_theme}/LeaderboardBG.jpg").convert_alpha(), (screen.get_height(), screen.get_height())),
 }
 
 title_rect = Backgrounds['title'].get_rect(midtop=(screen.get_width()/2, 20))
@@ -281,7 +292,8 @@ class Key:
         self.textRect = self.text.get_rect(center=(self.pos_x+self.width/2, self.pos_y+self.height/2)) # Szöveg helye
 
     def draw(self):
-        pygame.draw.rect(screen, (0,0,100), (self.pos_x, self.pos_y, self.width, self.height), 0, 50)
+        self.text = self.font.render(self.letter.upper(), True, keyboard_colors[selected_background_theme_number][1]) # Szöveg
+        pygame.draw.rect(screen, keyboard_colors[selected_background_theme_number][0], (self.pos_x, self.pos_y, self.width, self.height), 0, 50)
         screen.blit(self.text, self.textRect)
 
     def click(self, event):
@@ -527,12 +539,21 @@ while running:
 
 
     elif mode == "save":
+        bg_rect = Backgrounds["leaderboardBG"].get_rect()
+        bg_rect.center = (screen.get_width() / 2, screen.get_height() / 2)
 
-        color = (255, 255, 255)
+
+        if background_theme == "Medieval":
+            color = (0, 0, 0)
+        elif background_theme == "Original":
+            color = (255, 255, 255)
+        else:
+            color = (255, 255, 255)
+
         font = pygame.font.Font('freesansbold.ttf', 30)
         for event in pygame.event.get():
-
-            screen.fill((30,30,30))
+            screen.blit(Backgrounds["leaderboardBG"], bg_rect)
+            HoverLine(10)
 
             screen.blit(font.render(Key.new_name[-3:], True, color), font.render(Key.new_name[-3:], True, color).get_rect(topleft=(screen.get_width() / 2 - 125, 500)))
             screen.blit(font.render(str(Score.Score(cards)), True, color),font.render(str(Score.Score(cards)), True, color).get_rect(topright=(screen.get_width() / 2 + 125, 500)))
@@ -587,17 +608,24 @@ while running:
                 cards = []
 
     elif mode == "leaderboard":
+        bg_rect = Backgrounds["leaderboardBG"].get_rect()
+        bg_rect.center = (screen.get_width() / 2, screen.get_height() / 2)
 
 
         for event in pygame.event.get():
-
-            screen.fill((30,30,30))
-
+            screen.blit(Backgrounds["leaderboardBG"], bg_rect)
+            HoverLine(20)
 
             dict_y = 10
             Scores = dict(sorted(Scores.items(), key=lambda x: x[1], reverse=True))
 
-            color = (255, 255, 255)
+            if background_theme == "Medieval":
+                color = (0, 0, 0)
+            elif background_theme == "Original":
+                color = (255, 255, 255)
+            else:
+                color = (255, 255, 255)
+
             font = pygame.font.Font('freesansbold.ttf', 30)
             for score in Scores.keys():
                 font_place = font.render(str((dict_y-10)/40+1)[:-1], True, color)
@@ -691,6 +719,8 @@ while running:
                         "icon": pygame.image.load(f'../Images/Backgrounds/{background_theme}/Logo.webp'),
                         "title": pygame.transform.scale(pygame.image.load(f'../Images/Backgrounds/{background_theme}/Title.png'),(screen.get_width() / 1.2, screen.get_width() / 1.2 / 4)),
                         "bg_menu": pygame.transform.scale(pygame.image.load(f"{image_path}/../Backgrounds/{background_theme}/MenuHatter.png").convert_alpha(),(screen.get_height(), screen.get_height())),
+                        "leaderboardBG": pygame.transform.scale(pygame.image.load(
+                            f"{image_path}/../Backgrounds/{background_theme}/LeaderboardBG.jpg").convert_alpha(),(screen.get_height(), screen.get_height())),
                     }
 
                     for button in setting_buttons:
