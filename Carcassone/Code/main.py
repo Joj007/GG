@@ -15,7 +15,7 @@ Sounds={
 } # Szótár a játékban található hangefektekről
 
 # Zenék betöltése
-music_themes = ["Medieval", "Original"] # Témák: Original, Medieval
+music_themes = ["Medieval", "Original", "Space"] # Témák: Original, Medieval
 selected_music_theme_number = 0
 music_theme = music_themes[selected_music_theme_number]
 
@@ -246,12 +246,12 @@ else:
 
 
 # Háttérképek betöltése
-background_themes = ["Medieval", "Original"]
+background_themes = ["Medieval", "Original", "Space"]
 selected_background_theme_number = 0
 background_theme = background_themes[selected_background_theme_number]
-button_colors = [(124, 101, 66),(50,50,255)]
-button_hover_colors = [(154, 131, 96),(80,80,255)]
-keyboard_colors=[[(0,0,0),(255,255,255)], [(50,50,255),(255,255,255)]]
+button_colors = [(124, 101, 66), (50,50,255), (50,50,255)]
+button_hover_colors = [(154, 131, 96),(80,80,255), (80,80,255)]
+keyboard_colors=[[(0,0,0),(255,255,255)], [(50,50,255),(255,255,255)], [(50,50,255),(255,255,255)]]
 
 Backgrounds = {
     "bg_game": pygame.transform.scale(pygame.image.load(f"{image_path}/../Backgrounds/{background_theme}/gameBG.jpg").convert_alpha(), (screen.get_height() if screen.get_height() > screen.get_width() else screen.get_width(), screen.get_height() if screen.get_height() > screen.get_width() else screen.get_width())),
@@ -546,6 +546,8 @@ while running:
         if background_theme == "Medieval":
             color = (0, 0, 0)
         elif background_theme == "Original":
+            color = (255, 255, 255)
+        elif background_theme == "Space":
             color = (255, 255, 255)
         else:
             color = (255, 255, 255)
