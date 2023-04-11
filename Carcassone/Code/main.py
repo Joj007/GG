@@ -12,21 +12,27 @@ pygame.display.set_caption('Carcassone')
 Sounds={
     "click": mixer.Sound('../Sounds/click.wav'),
     "wrong": mixer.Sound('../Sounds/wrong.wav')
-}
+} # Szótár a játékban található hangefektekről
 
-theme = "Medieval"
-music_path = f'../Music/{theme}/'
+# Zenék betöltése
+music_themes = ["Medieval", "Original"] # Témák: Original, Medieval
+selected_music_theme_number = 0
+music_theme = music_themes[selected_music_theme_number]
+
+music_path = f'../Music/{music_theme}/'
 Musics=[]
 for music in os.listdir(music_path):
     Musics.append(mixer.Sound(f"{music_path}{music}"))
 
 
-running = True
-mode = "menu"
-screen = pygame.display.set_mode((constants.SCREEN_SIZE_BASE*constants.TABLE_SIZE_X, constants.SCREEN_SIZE_BASE*constants.TABLE_SIZE_Y)) # Card sized screen
-# screen = pygame.display.set_mode((1600, 900)) # Fix sized screen
-# screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN) # Full screen mode
 
+running = True
+mode = "menu" # Menüpontok: game(Játék), menu(Főmenü), leaderboard(Pontszámlista), save(Mentés)
+screen = pygame.display.set_mode((constants.SCREEN_SIZE_BASE*constants.TABLE_SIZE_X, constants.SCREEN_SIZE_BASE*constants.TABLE_SIZE_Y)) # Kártyákhoz igazított méretű képernyő
+# screen = pygame.display.set_mode((1600, 900)) # Fix méretű képernyő
+# screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN) # Teljes képernyős mód
+
+# Kártyák méretének beállítása
 if screen.get_width()/constants.TABLE_SIZE_X > screen.get_height()/constants.TABLE_SIZE_Y:
     image_size = [screen.get_height()/constants.TABLE_SIZE_Y,screen.get_height()/constants.TABLE_SIZE_Y]
 else:
@@ -34,11 +40,12 @@ else:
 
 image_path = "../Images/Tiles"
 
-
+# Kézben lévő kártya elmentése fájlba
 def SaveCurrentCard():
     with open("../Save/CurrentCard", "w") as f:
         f.write(choosen_tile)
 
+# Letett kártyák elmentése fájlba
 def SaveCurrentGame(placed_cards):
     EmptyFile("PrewGame")
     with open("../Save/PrewGame", "a") as f:
@@ -47,6 +54,7 @@ def SaveCurrentGame(placed_cards):
     SavePack(Pack)
     SaveCurrentCard()
 
+# A palkiban lévő kártyák elmentése fájlba
 def SavePack(pack):
     EmptyFile("Pack")
     with open("../Save/Pack", "a") as f:
@@ -54,7 +62,7 @@ def SavePack(pack):
             f.write(f"{card}\n")
 
 
-
+# Előző játék betöltése
 def ReadPrewGame():
     cards = []
     with open("../Save/PrewGame", "r") as f:
@@ -83,11 +91,13 @@ def ReadPrewGame():
             cards.append(Card(pygame.transform.rotate(ImageLoader(image_name), card_list[-1]), int(card_list[1]), int(card_list[2]), card_list[0], card_list[3]))
     return cards
 
+# Előző kézben lévő kártya betöltése
 def ReadCurrentCard():
     with open("../Save/CurrentCard", "r") as f:
         card = f.read()
     return card
 
+# Előző pakli betöltése
 def ReadPack():
     pack = []
     with open("../Save/Pack", "r") as f:
@@ -95,14 +105,16 @@ def ReadPack():
             pack.append(card.rstrip())
     return pack
 
-
+# Fájl kiürítése
 def EmptyFile(file):
     with open(f"../Save/{file}", "w") as f:
         f.write("")
 
+# Kép betöltése
 def ImageLoader(file_name):
     return pygame.transform.scale(pygame.image.load(f"{image_path}/{file_name}.png").convert_alpha(), image_size)
 
+# Teszt arra, hogy adott helyre letehető-e a kézben lévő kártya
 def Placeable(selected_card, location, placed_cards):  # selected_card egy card class, a location egy számpár [2, 3], a placed_cards pedig egy lista a lerakott kártya classekkel
     location = [int(location[1]-1), int(location[0]-1)]
     matrix = []
@@ -138,6 +150,7 @@ def Placeable(selected_card, location, placed_cards):  # selected_card egy card 
     else:
         return True
 
+# Teszt arra, hogy lehetséges-e a játék folytatása, illetve mely helyeken
 def Is_game_over(selected_card, placed_cards):
     list_of_placeable_tiles = []
     if len(placed_cards)==constants.TABLE_SIZE_X*constants.TABLE_SIZE_Y:
@@ -157,6 +170,7 @@ def Is_game_over(selected_card, placed_cards):
     else:
         return (True, list_of_placeable_tiles)
 
+# Rekordok feltöltése fájlba
 def WriteHighScore():
     with open("../Save/HighScores", "w") as f:
         f.write("")
@@ -164,6 +178,7 @@ def WriteHighScore():
         for score in Scores.items():
             f.write(f"{score[0][-3:]};{score[1]}\n")
 
+# Új pakli létrehozása
 def Create_pack():
     All_tiles = ["mmmmk", "mmumk", "mmuu_", "mumu_", "muuu_", "mvmvc", "mvmvv", "uuuu_", "vmmm_", "vmuu_", "vmvm_",
                  "vumu_", "vuum_", "vuuu_", "vvmm_", "vvmmc", "vvmmv", "vvmvc", "vvmvv", "vvuu_", "vvuuc", "vvuvc",
@@ -190,6 +205,7 @@ def Create_pack():
 
     return Pack
 
+# Zenével kapcsolatos beállítások
 def MusicKeyHandler(event, choosen_music):
     if event.key == pygame.K_KP_PLUS:
         choosen_music.set_volume(choosen_music.get_volume() + 0.1)
@@ -200,6 +216,7 @@ def MusicKeyHandler(event, choosen_music):
     elif event.key == pygame.K_RETURN:
         choosen_music.stop()
 
+# Segítségek megjelenítése
 def ColorFreeSpaces(free_spaces):
     transparent_square = pygame.Surface((int(image_size[0])-10, int(image_size[1])-10))
     transparent_square.set_alpha(64)
@@ -207,7 +224,7 @@ def ColorFreeSpaces(free_spaces):
     for free_space in free_spaces:
         screen.blit(transparent_square, (free_space[0]*constants.SCREEN_SIZE_BASE+5, free_space[1]*constants.SCREEN_SIZE_BASE+5))
 
-
+# Új pakli generálása, illetve előző pakli betöltése
 if len(ReadPack()) == 0:
     Pack = Create_pack()
 else:
@@ -219,65 +236,66 @@ else:
 
 
 
+# Háttérképek betöltése
+background_themes = ["Medieval", "Original"]
+selected_background_theme_number = 0
+background_theme = background_themes[selected_background_theme_number]
+button_colors = [(124, 101, 66),(50,50,255)]
+button_hover_colors = [(154, 131, 96),(80,80,255)]
 
 Backgrounds = {
-    "bg_wide": pygame.transform.scale(pygame.image.load(f"{image_path}/../Backgrounds/carcassonneBG1.jfif").convert_alpha(), (screen.get_width(), screen.get_height())),
-    "bg_tall": pygame.transform.scale(pygame.image.load(f"{image_path}/../Backgrounds/carcassonneBG2.webp").convert_alpha(), (screen.get_width(), screen.get_height())),
-    "bg_square": pygame.transform.scale(pygame.image.load(f"{image_path}/../Backgrounds/carcassonneBG3.jpg").convert_alpha(), (screen.get_width(), screen.get_height())),
-    "bg_game": pygame.transform.scale(pygame.image.load(f"{image_path}/../Backgrounds/gameBG.jpg").convert_alpha(), (screen.get_height() if screen.get_height() > screen.get_width() else screen.get_width(), screen.get_height() if screen.get_height() > screen.get_width() else screen.get_width())),
-    "icon": pygame.image.load('../Images/Backgrounds/Logo.webp'),
-    "title": pygame.transform.scale(pygame.image.load('../Images/Backgrounds/Title.png'), (screen.get_width()/1.2, screen.get_width()/1.2/4)),
-    "bg_menu": pygame.transform.scale(pygame.image.load(f"{image_path}/../Backgrounds/MenuHatter.png").convert_alpha(), (screen.get_height(), screen.get_height())),
+    "bg_game": pygame.transform.scale(pygame.image.load(f"{image_path}/../Backgrounds/{background_theme}/gameBG.jpg").convert_alpha(), (screen.get_height() if screen.get_height() > screen.get_width() else screen.get_width(), screen.get_height() if screen.get_height() > screen.get_width() else screen.get_width())),
+    "icon": pygame.image.load(f'../Images/Backgrounds/{background_theme}/Logo.webp'),
+    "title": pygame.transform.scale(pygame.image.load(f'../Images/Backgrounds/{background_theme}/Title.png'), (screen.get_width()/1.2, screen.get_width()/1.2/4)),
+    "bg_menu": pygame.transform.scale(pygame.image.load(f"{image_path}/../Backgrounds/{background_theme}/MenuHatter.png").convert_alpha(), (screen.get_height(), screen.get_height())),
 }
 
 title_rect = Backgrounds['title'].get_rect(midtop=(screen.get_width()/2, 20))
 
 pygame.display.set_icon(Backgrounds['icon'])
 
-menu_background = Backgrounds["bg_tall"]
-
-if abs(screen.get_width()-screen.get_height()<30):
-    menu_background = Backgrounds["bg_square"]
-elif screen.get_width() > screen.get_height():
-    menu_background = Backgrounds["bg_wide"]
-
+# Kártya osztáy
 class Card:
     def __init__(self, image, x, y, name, rotation):
-        self.image = image
-        self.pos = self.pos_x, self.pos_y = x, y
-        self.sides = name
-        self.rotation = rotation
+        self.image = image # A kártya képe
+        self.pos = self.pos_x, self.pos_y = x, y # A kártya pozíciója
+
+        # Lehetséges karakterek: m(ező), c(ímer), k(olostor), v(áros), u(t), _(semmi/mező középen)
+        self.sides = name # A kártya 4 oldala, és közepe egy-egy karakterrel (pl.:mvmvm->Északon:mező, Keleten: város, Délen: mező, Nyugaton: város, Középen: mező)
+        self.rotation = rotation # Forgatás mértéke
 
     def draw(self):
         screen.blit(self.image, (self.pos_x*image_size[0], self.pos_y*image_size[1]))
 
-
+# Billentyű osztáy
 class Key:
-    new_name = "___"
+    new_name = "___" # Mentendő pontszám neve
 
     def __init__(self, letter, pos_x, pos_y, width, height):
-        self.letter = letter
-        self.pos = self.pos_x, self.pos_y = pos_x, pos_y
-        self.width = width
-        self.height = height
-        self.font = pygame.font.Font('freesansbold.ttf', int(width/2))
-        self.text = self.font.render(letter.upper(), True, (255, 255, 255))
-        self.textRect = self.text.get_rect(center=(self.pos_x+self.width/2, self.pos_y+self.height/2))
+        self.letter = letter # Karakter
+        self.pos = self.pos_x, self.pos_y = pos_x, pos_y # Billentyű pozíciója
+        self.width = width # Billentyű szélessége
+        self.height = height # Billenytű magassága
+        self.font = pygame.font.Font('freesansbold.ttf', int(width/2)) # Betűtípus
+        self.text = self.font.render(letter.upper(), True, (255, 255, 255)) # Szöveg
+        self.textRect = self.text.get_rect(center=(self.pos_x+self.width/2, self.pos_y+self.height/2)) # Szöveg helye
 
     def draw(self):
         pygame.draw.rect(screen, (0,0,100), (self.pos_x, self.pos_y, self.width, self.height), 0, 50)
         screen.blit(self.text, self.textRect)
 
     def click(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            mouse_pos = mouse_pos_x, mouse_pos_y = pygame.mouse.get_pos()
-            distance = abs(math.sqrt((mouse_pos_x-self.pos_x-self.width/2)**2 + (mouse_pos_y-self.pos_y-self.height/2)**2))
-            if distance < self.width/2:
-                Key.new_name += self.letter
-                Sounds['click'].play()
+        if event.type == pygame.MOUSEBUTTONDOWN: # Egérkattintáskor
+            mouse_pos = mouse_pos_x, mouse_pos_y = pygame.mouse.get_pos() # Egér pozíciója
+            distance = abs(math.sqrt((mouse_pos_x-self.pos_x-self.width/2)**2 + (mouse_pos_y-self.pos_y-self.height/2)**2)) # Távolság a billentyű közepétől
+            if distance < self.width/2: # Billenytűre kattintáskor igaz
+                Key.new_name += self.letter # Név bevitele
+                Sounds['click'].play() # Hang lejátszása
 
 
-Scores = dict()
+Scores = dict() # Szótár a pontszámokhoz
+
+# Pontszámok beolvasása fájlból
 with open("../Save/HighScores", "r") as f:
     for line in f:
         line = line.split("\n")
@@ -286,7 +304,7 @@ with open("../Save/HighScores", "r") as f:
                 continue
             Scores[element.split(";")[0]] = int(element.split(";")[1])
 
-
+# Osztáy a menü gombjaihoz
 class CenterRectButton:
     def __init__(self, width, height, pos_y, color=(100,100,100), text="Start", text_size=36):
         self.width = width
@@ -296,8 +314,12 @@ class CenterRectButton:
         self.pos_y = pos_y
         self.color = color
         self.to_game = False
+        self.to_settings = False
+        self.to_menu = False
         self.to_exit = False
         self.to_leaderboard = False
+        self.to_next_playlist = False
+        self.to_next_background_theme = False
         self.font = pygame.font.Font('freesansbold.ttf', text_size)
         self.original_text = text
         self.text = self.font.render(text.upper(), True, (255, 255, 255))
@@ -312,12 +334,27 @@ class CenterRectButton:
         if event.type == pygame.MOUSEBUTTONDOWN and (screen.get_width()-self.act_width)/2 < mouse_pos_x < (screen.get_width()-self.act_width)/2+self.act_width and self.pos_y < mouse_pos_y < self.pos_y + self.act_height:
             if self.original_text == "START":
                 self.to_game = True
+                pygame.display.set_caption('Carcassone')
+            elif self.original_text == "SETTINGS":
+                self.to_settings = True
+                pygame.display.set_caption('Carcassone')
             elif self.original_text == "LEADERBOARD":
                 self.to_leaderboard = True
+                pygame.display.set_caption('Carcassone')
+            elif self.original_text == "BACK":
+                self.to_menu = True
+                pygame.display.set_caption('Carcassone')
             elif self.original_text == "EXIT":
                 self.to_exit = True
+            elif self.original_text == "NEXT PLAYLIST":
+                self.to_next_playlist = True
+            elif self.original_text == "NEXT THEME":
+                self.to_next_background_theme = True
             Sounds['click'].play()
-
+        elif (screen.get_width()-self.act_width)/2 < mouse_pos_x < (screen.get_width()-self.act_width)/2+self.act_width and self.pos_y < mouse_pos_y < self.pos_y + self.act_height:
+            self.color = button_hover_colors[selected_background_theme_number]
+        else:
+            self.color = button_colors[selected_background_theme_number]
 
 cards = ReadPrewGame()
 
@@ -334,8 +371,9 @@ for line, line_index in zip(letters, range(len(letters))):
     for letter, letter_index in zip(line, range(len(line))):
         keys.append(Key(letter, eltolas_x/2+letter_index*(hossz+eltolas_x), eltolas_y+line_index*(hossz+eltolas_y)+(screen.get_height()-len(letters)*(magassag+eltolas_y)-eltolas_y), hossz, magassag))
 
+setting_buttons = [CenterRectButton(70, 10, 350, (124, 101, 66), "NEXT THEME"), CenterRectButton(70, 10, 450, (124, 101, 66), "NEXT PLAYLIST"), CenterRectButton(70, 10, 550, (124, 101, 66), "BACK")]
+menu_buttons = [CenterRectButton(70, 10, 350, (124, 101, 66), "START"),CenterRectButton(70, 10, 450, (124, 101, 66), "SETTINGS"), CenterRectButton(70, 10, 550, (124, 101, 66), "LEADERBOARD"), CenterRectButton(70, 10, 650, (124, 101, 66), "EXIT")]
 
-buttons = [CenterRectButton(70, 10, 350, (124, 101, 66), "START"), CenterRectButton(70, 10, 450, (124, 101, 66), "LEADERBOARD"), CenterRectButton(70, 10, 550, (124, 101, 66), "EXIT")]
 if ReadCurrentCard() != "":
     choosen_tile = ReadCurrentCard()
 else:
@@ -450,12 +488,12 @@ while running:
 
         screen.blit(Backgrounds["title"], title_rect)
 
-        for button in buttons:
+        for button in menu_buttons:
             button.draw()
 
         for event in pygame.event.get():
 
-            for button in buttons:
+            for button in menu_buttons:
                 button.click(event)
                 if button.to_game:
                     Key.new_name = "___"
@@ -467,6 +505,9 @@ while running:
                         EmptyFile("Pack")
                         EmptyFile("PrewGame")
                         EmptyFile("CurrentCard")
+                elif button.to_settings:
+                    mode = "settings"
+                    button.to_settings = False
                 elif button.to_leaderboard:
                     mode = "leaderboard"
                     button.to_leaderboard = False
@@ -602,6 +643,71 @@ while running:
                 mode = "menu"
                 cards = []
 
+    elif mode == "settings":
+        bg_rect = Backgrounds["bg_menu"].get_rect()
+        bg_rect.center = (screen.get_width() / 2, screen.get_height() / 2)
+        screen.blit(Backgrounds["bg_menu"], bg_rect)
+
+        screen.blit(Backgrounds["title"], title_rect)
+
+        for button in setting_buttons:
+            button.draw()
+
+        for event in pygame.event.get():
+
+            for button in setting_buttons:
+                button.click(event)
+                if button.to_menu:
+                    mode = "menu"
+                    button.to_menu = False
+                elif button.to_next_playlist:
+
+                    choosen_music.stop()
+                    selected_music_theme_number += 1
+                    if selected_music_theme_number == len(music_themes):
+                        selected_music_theme_number = 0
+                    music_theme = music_themes[selected_music_theme_number]
+
+                    music_path = f'../Music/{music_theme}/'
+                    Musics = []
+                    for music in os.listdir(music_path):
+                        Musics.append(mixer.Sound(f"{music_path}{music}"))
+                    random_music_number = random.randint(0, len(Musics) - 1)
+                    choosen_music = Musics[random_music_number]
+                    choosen_music.play()
+
+                    pygame.display.set_caption(f"Selected playlist: {music_theme}")
+                    button.to_next_playlist = False
+                elif button.to_next_background_theme:
+                    button.to_next_background_theme = False
+                    selected_background_theme_number += 1
+                    if selected_background_theme_number == len(background_themes):
+                        selected_background_theme_number = 0
+                    background_theme = background_themes[selected_background_theme_number]
+
+
+                    Backgrounds = {
+                        "bg_game": pygame.transform.scale(pygame.image.load(f"{image_path}/../Backgrounds/{background_theme}/gameBG.jpg").convert_alpha(), (screen.get_height() if screen.get_height() > screen.get_width() else screen.get_width(),screen.get_height() if screen.get_height() > screen.get_width() else screen.get_width())),
+                        "icon": pygame.image.load(f'../Images/Backgrounds/{background_theme}/Logo.webp'),
+                        "title": pygame.transform.scale(pygame.image.load(f'../Images/Backgrounds/{background_theme}/Title.png'),(screen.get_width() / 1.2, screen.get_width() / 1.2 / 4)),
+                        "bg_menu": pygame.transform.scale(pygame.image.load(f"{image_path}/../Backgrounds/{background_theme}/MenuHatter.png").convert_alpha(),(screen.get_height(), screen.get_height())),
+                    }
+
+                    for button in setting_buttons:
+                        button.color = button_colors[selected_background_theme_number]
+                    for button in menu_buttons:
+                        button.color = button_colors[selected_background_theme_number]
+
+                    pygame.display.set_caption(f"Selected theme: {background_theme}")
+
+
+
+            if event.type == pygame.QUIT:
+                running = False
+                exit()
+
+            elif event.type == pygame.KEYDOWN:
+                MusicKeyHandler(event, choosen_music)
 
 
 
