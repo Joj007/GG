@@ -16,6 +16,7 @@ body {
     background-image: url(képek/hatter1.png);
     background-repeat: no-repeat;
     background-size: cover;
+    margin-bottom: 80px;
 }
 
 #focim{
@@ -36,7 +37,7 @@ body {
     height: 320px;
 }
 
-#container{
+#body-container{
     max-width: 1050px;
     min-width: 800px;
     width: 80%;
@@ -47,7 +48,7 @@ body {
 
 #texthatter{
     width: 80%;
-    height: 1150px;
+    height: 1350px;
     max-width: 1050px;
     min-width: 800px;
 }
@@ -75,4 +76,29 @@ body {
 
 .content{
     font-size: 20px;
+}
+
+#impressum-kep{
+    width: 700px;
+    height: 55px;
+}
+
+footer{
+    margin-top: 180px;
+    margin-bottom: 10px;
+    width: 100%;
+    text-align: center;
+}
+
+#impressum{
+    margin-top: -40px;
+}
+
+#impressum-content{
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.pelda{
+    height: 300px;
+    margin-left: 130px;
 }
