@@ -1,5 +1,10 @@
 from itertools import permutations
 
+class Card:
+    def __init__(self, x, y, sides):
+        self.pos = self.pos_x, self.pos_y = x, y
+        self.sides = sides
+
 SORRENDEK = list(permutations([0, 1, 2, 3], 4))
 
 def Score(cards):
@@ -28,7 +33,7 @@ def VarosPont(cards):
                         varos_lista = VarosBejar(kartya, varos_lista, cards, index)
                         varos_reszek += 1
 
-    return (varos_reszek + cimer) * 2 + len([pos for sublist in Ellenorzes(varos_lista) for pos in sublist]) * 5
+    return (varos_reszek + cimer) * 2 + len(Ellenorzes(varos_lista)) * 5
 
 def VarosBejar(kartya, varos_lista, cards, kezdo_irany = None):
     megvizsgalt, vizsgalandok = [], [kartya]
@@ -187,3 +192,9 @@ def UtSzomszedok(cards, pos, sorrend):
             szomszedok.append(temp[0])
 
     return szomszedok
+
+lista = [
+    Card(1, 0, "mmvm_"), Card(0, 1, "mvmm_"), Card(1, 1, "vvvv_"), Card(2, 1, "mmmv_"), Card(1, 2, "vmmm_")
+]
+
+print(Score(lista))
