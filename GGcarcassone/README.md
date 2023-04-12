@@ -1,4 +1,4 @@
->># Carcassone
+# Carcassone
 >## A játékról
 >- A játék **pythonban** készült
 >- Az indításhoz le kell tölteni a **pygame** nevű modult, mert főleg azzal készült
